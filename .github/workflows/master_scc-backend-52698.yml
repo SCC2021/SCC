@@ -6,7 +6,7 @@ name: Build and deploy JAR app to Azure Web App - scc-backend-52698
 on:
   push:
     branches:
-      - master
+      - deploy_horta
   workflow_dispatch:
 
 jobs:
