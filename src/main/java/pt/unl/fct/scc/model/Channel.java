@@ -12,7 +12,7 @@ import java.util.List;
 public class Channel {
     private String id;
     private String name;
-    private String status;
+    private boolean isPrivate;
     private String owner;
-    private List<String> members;
+    private String[] members;
 }

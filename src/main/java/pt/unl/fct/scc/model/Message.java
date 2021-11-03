@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {
-    private String sender;
-    private String channelDest;
-    private String body;
-    private String[] media;
+    private String id;
     private String responseTo;
+    private String channelDest;
+    private String user;
+    private String body;
+    private String mediaId;
 }
