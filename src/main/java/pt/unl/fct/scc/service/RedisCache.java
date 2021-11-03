@@ -32,4 +32,8 @@ public class RedisCache {
         this.jedisPool = new JedisPool(poolConfig,redisHostName,6380,1000,redisKey, true);
     }
 
+    public JedisPool getJedisPool() {
+        return jedisPool;
+    }
+
 }

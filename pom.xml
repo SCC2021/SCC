@@ -132,34 +132,7 @@
             </exclude> 
           </excludes> 
         </configuration> 
-      </plugin>  
-      <plugin> 
-        <groupId>com.microsoft.azure</groupId>  
-        <artifactId>azure-webapp-maven-plugin</artifactId>  
-        <version>2.1.0</version>  
-        <configuration> 
-          <schemaVersion>V2</schemaVersion>  
-          <pricingTier>F1</pricingTier>  
-          <region>westeurope</region>  
-          <runtime> 
-            <os>linux</os>  
-            <javaVersion>java8</javaVersion>
-            <webContainer>TOMCAT 9.0</webContainer> 
-          </runtime>  
-          <deployment> 
-            <resources> 
-              <resource> 
-                <directory>${project.basedir}/target</directory>  
-                <includes> 
-                  <include>*.war</include> 
-                </includes> 
-              </resource> 
-            </resources> 
-          </deployment>  
-          <resourceGroup>scc-backend-rg-52919</resourceGroup>  
-          <appName>scc-backend-52919</appName> 
-        </configuration> 
-      </plugin> 
+      </plugin>
     </plugins> 
   </build> 
 </project>

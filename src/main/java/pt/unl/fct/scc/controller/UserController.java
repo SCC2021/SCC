@@ -10,6 +10,8 @@ import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.service.UserService;
 
+import java.util.Iterator;
+
 @RestController
 @RequestMapping("/rest/users")
 public class UserController {
@@ -59,15 +61,35 @@ public class UserController {
 
     @GetMapping("/{id}")
     public  ResponseEntity<?> getUserByID(@PathVariable String id){
-        Object[] res;
+        Iterator res;
         try {
-            res = userService.getUserById(id).stream().toArray();
+            res = userService.getUserById(id).stream().iterator();
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (res.length <= 0){
+        if (!res.hasNext()){
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+
+        User u = (User) res.next();
+
+        return new ResponseEntity<>(u, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/channels")
+    public  ResponseEntity<?> getUserChannelsByID(@PathVariable String id){
+        Iterator res;
+        try {
+            res = userService.getUserById(id).stream().iterator();
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (!res.hasNext()){
+            return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
+        }
+
+        User u = (User) res.next();
+
+        return new ResponseEntity<>(u.getChannelIds(), HttpStatus.OK);
     }
 }
