@@ -16,7 +16,13 @@
   <name>scc</name>  
   <description>scc</description>  
   <properties> 
-    <java.version>1.8</java.version> 
+    <java.version>1.8</java.version>
+
+    <functionAppName>sccfunctions52698</functionAppName>
+    <functionAppRegion>westeurope</functionAppRegion>
+    <functionPricingTier>B1</functionPricingTier>
+    <functionResourceGroup>scc-52698-rg</functionResourceGroup>
+
   </properties>  
   <dependencies> 
     <dependency> 
@@ -97,7 +103,12 @@
       <groupId>com.azure</groupId>  
       <artifactId>azure-cosmos</artifactId>  
       <version>4.20.0</version> 
-    </dependency>  
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.azure.functions</groupId>
+      <artifactId>azure-functions-java-library</artifactId>
+      <version>1.4.2</version>
+    </dependency>
     <dependency> 
       <groupId>org.apache.commons</groupId>  
       <artifactId>commons-lang3</artifactId>  
