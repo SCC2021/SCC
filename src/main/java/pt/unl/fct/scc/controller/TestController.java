@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping
     public String version(){
-        return "version: 0001 - Horta's branch";
+        return "version: 0002 - first i'm alive httpTrigger";
     }
 }
