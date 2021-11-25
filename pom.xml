@@ -18,7 +18,10 @@
   <properties> 
     <java.version>1.8</java.version>
 
-
+    <functionAppName>sccfunctions52698</functionAppName>
+    <functionAppRegion>westeurope</functionAppRegion>
+    <functionPricingTier>B1</functionPricingTier>
+    <functionResourceGroup>scc-52698-rg</functionResourceGroup>
 
   </properties>  
   <dependencies> 
