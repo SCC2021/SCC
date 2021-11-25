@@ -11,22 +11,22 @@ import pt.unl.fct.scc.service.CosmosDBService;
 
 import java.util.Optional;
 
-@Service
+//@Service
 public class HttpTriggers {
 
-    CosmosContainer userContainer;
+    /*CosmosContainer userContainer;
 
     public HttpTriggers(CosmosDBService cosmosDBService){
         this.userContainer = cosmosDBService.getContainer("Users");
-    }
+    }*/
 
     @FunctionName("updateUsersAfterChannelDelete")
     public HttpResponseMessage updateUsersAfterChannelDelete(@HttpTrigger(name = "updateUsersAfterChannelDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
             route = "/rest/channels/{id}") HttpRequestMessage<Optional<String>> request,
-            @BindingName("id") String id,
-            final ExecutionContext context) {
+                                                             @BindingName("id") String id,
+                                                             final ExecutionContext context) {
 
         return request.createResponseBuilder(HttpStatus.OK).body(String.format("Updated users in deleted channel: %s", id)).build();
     }

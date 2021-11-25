@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping
     public String version(){
-        return "version: 0004 - lol";
+        return "version: 0005 - trying to add functions";
     }
 }
