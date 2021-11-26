@@ -12,7 +12,7 @@ import pt.unl.fct.scc.service.CosmosDBService;
 import java.util.Optional;
 
 //@Service
-public class HttpFunction {
+public class Functions {
 
     /*CosmosContainer userContainer;
 
@@ -20,7 +20,7 @@ public class HttpFunction {
         this.userContainer = cosmosDBService.getContainer("Users");
     }*/
 
-    @FunctionName("update-users-after-channel-delete")
+    @FunctionName("clean-dead-channels")
     public HttpResponseMessage updateUsersAfterChannelDelete(@HttpTrigger(name = "updateUsersAfterChannelDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
@@ -31,7 +31,7 @@ public class HttpFunction {
         return request.createResponseBuilder(HttpStatus.OK).body(String.format("Updated users in deleted channel: %s", id)).build();
     }
 
-    @FunctionName("updateChannelsAfterUserDelete")
+    @FunctionName("clean-dead-users")
     public HttpResponseMessage updateChannelsAfterUserDelete(@HttpTrigger(name = "updateChannelsAfterUserDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
@@ -43,7 +43,7 @@ public class HttpFunction {
         return request.createResponseBuilder(HttpStatus.OK).body(String.format("Updated channels with deleted user: %s", id)).build();
     }
 
-    @FunctionName("updateMessagesAfterUserDelete")
+    @FunctionName("update-message-from-default-user")
     public HttpResponseMessage updateMessagesAfterUserDelete(@HttpTrigger(name = "updateMessagesAfterUserDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
