@@ -16,7 +16,7 @@ import pt.unl.fct.scc.service.CosmosDBService;
 import java.util.Optional;
 
 //@Service
-public class Functions extends FunctionInvoker<User, Message> {
+public class Functions {
 
     /*CosmosContainer userContainer;
 
