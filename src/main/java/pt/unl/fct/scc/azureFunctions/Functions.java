@@ -9,12 +9,14 @@ import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.scc.model.Message;
+import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.service.CosmosDBService;
 
 import java.util.Optional;
 
 //@Service
-public class Functions extends FunctionInvoker {
+public class Functions extends FunctionInvoker<User, Message> {
 
     /*CosmosContainer userContainer;
 
@@ -22,7 +24,7 @@ public class Functions extends FunctionInvoker {
         this.userContainer = cosmosDBService.getContainer("Users");
     }*/
 
-    @FunctionName("clean-dead-channels")
+    /*@FunctionName("clean-dead-channels")
     public HttpResponseMessage updateUsersAfterChannelDelete(@HttpTrigger(name = "updateUsersAfterChannelDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
@@ -43,7 +45,7 @@ public class Functions extends FunctionInvoker {
                                                              final ExecutionContext context) {
 
         return request.createResponseBuilder(HttpStatus.OK).body(String.format("Updated channels with deleted user: %s", id)).build();
-    }
+    }*/
 
     @FunctionName("updateMessagesAfterUserDelete")
     public HttpResponseMessage updateMessagesAfterUserDelete(@HttpTrigger(name = "updateMessagesAfterUserDelete",
