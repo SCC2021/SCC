@@ -12,7 +12,7 @@ import pt.unl.fct.scc.service.CosmosDBService;
 import java.util.Optional;
 
 //@Service
-public class HttpTriggers {
+public class HttpFunction {
 
     /*CosmosContainer userContainer;
 
@@ -20,7 +20,7 @@ public class HttpTriggers {
         this.userContainer = cosmosDBService.getContainer("Users");
     }*/
 
-    @FunctionName("updateUsersAfterChannelDelete")
+    @FunctionName("update-users-after-channel-delete")
     public HttpResponseMessage updateUsersAfterChannelDelete(@HttpTrigger(name = "updateUsersAfterChannelDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
