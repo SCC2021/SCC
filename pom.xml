@@ -172,7 +172,7 @@
           <runtime>
             <!-- runtime os, could be windows, linux or docker-->
             <os>windows</os>
-            <javaVersion>11</javaVersion>
+            <javaVersion>1.8</javaVersion>
           </runtime>
           <appSettings>
             <property>
