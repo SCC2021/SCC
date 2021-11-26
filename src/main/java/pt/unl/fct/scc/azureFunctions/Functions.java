@@ -45,7 +45,7 @@ public class Functions extends FunctionInvoker {
         return request.createResponseBuilder(HttpStatus.OK).body(String.format("Updated channels with deleted user: %s", id)).build();
     }
 
-    @FunctionName("update-message-from-default-user")
+    @FunctionName("updateMessagesAfterUserDelete")
     public HttpResponseMessage updateMessagesAfterUserDelete(@HttpTrigger(name = "updateMessagesAfterUserDelete",
             methods = {HttpMethod.DELETE},
             authLevel = AuthorizationLevel.ANONYMOUS,
