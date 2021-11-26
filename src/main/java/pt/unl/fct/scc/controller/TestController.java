@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping
     public String version(){
-        return "version: 0006 - trying to add functions";
+        return "version: 0008 - added spring-cloud-function-adapter-azure dependency";
     }
 }

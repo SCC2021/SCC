@@ -22,6 +22,7 @@
     <functionAppRegion>westeurope</functionAppRegion>
     <functionPricingTier>B1</functionPricingTier>
     <functionResourceGroup>scc-52698-rg</functionResourceGroup>
+    <start-class>main.java.pt.unl.fct.scc.azureFunctions.Functions</start-class>
 
   </properties>  
   <dependencies> 
@@ -43,7 +44,12 @@
       <groupId>org.springframework.boot</groupId>  
       <artifactId>spring-boot-starter-test</artifactId>  
       <scope>test</scope> 
-    </dependency>  
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-function-adapter-azure</artifactId>
+      <version>3.1.5</version>
+    </dependency>
     <dependency> 
       <groupId>javax.ws.rs</groupId>  
       <artifactId>javax.ws.rs-api</artifactId>  
