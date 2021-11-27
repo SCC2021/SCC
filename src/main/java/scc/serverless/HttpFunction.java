@@ -111,7 +111,7 @@ public class HttpFunction {
 //		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
 //			jedis.incr("cnt:http");
 //		}
-		
+
 		return request.createResponseBuilder(HttpStatus.OK).body(txt).build();
 	}
 
@@ -124,5 +124,15 @@ public class HttpFunction {
 				@BindingName("text") String txt, 
 				final ExecutionContext context) {
 		return request.createResponseBuilder(HttpStatus.OK).body(txt).build();
+	}
+
+	@FunctionName("clean-deleted_channels")
+	public HttpResponseMessage cleanDeletedChannels(@HttpTrigger(name = "req",
+			methods = {HttpMethod.POST},
+			authLevel = AuthorizationLevel.ANONYMOUS,
+			route = "rest/users")
+												  HttpRequestMessage<Optional<String>> request,
+										  final ExecutionContext context) {
+		return request.createResponseBuilder(HttpStatus.OK).body("User was added.").build();
 	}
 }
