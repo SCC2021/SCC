@@ -1,0 +1,5 @@
+scc\cache\RedisCache.class
+scc\serverless\HttpFunction.class
+scc\serverless\TimerFunction.class
+scc\serverless\BlobStoreFunction.class
+scc\serverless\CosmosDBFunction.class
