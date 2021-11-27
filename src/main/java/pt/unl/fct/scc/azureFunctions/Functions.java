@@ -3,7 +3,6 @@ package pt.unl.fct.scc.azureFunctions;
 import com.azure.cosmos.CosmosContainer;
 import com.microsoft.azure.functions.*;
 
-import org.springframework.cloud.function.adapter.azure.FunctionInvoker;
 
 import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.*;
