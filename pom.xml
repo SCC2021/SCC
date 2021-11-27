@@ -43,13 +43,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>
+        <!-- sacado do -->
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-function-dependencies</artifactId>
             <version>3.1.0</version>
             <type>pom</type>
             <scope>import</scope>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
@@ -110,11 +111,11 @@
             <artifactId>azure-cosmos</artifactId>
             <version>4.20.0</version>
         </dependency>
-        <!-- <dependency>
+        <dependency>
             <groupId>com.microsoft.azure.functions</groupId>
             <artifactId>azure-functions-java-library</artifactId>
             <version>1.4.2</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -136,22 +137,6 @@
             <version>3.7.0</version>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-function-dependencies</artifactId>
-                <version>3.1.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.microsoft.azure.functions</groupId>
-                <artifactId>azure-functions-java-library</artifactId>
-                <version>1.4.2</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
