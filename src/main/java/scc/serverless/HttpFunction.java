@@ -111,6 +111,7 @@ public class HttpFunction {
 //		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
 //			jedis.incr("cnt:http");
 //		}
+		
 		return request.createResponseBuilder(HttpStatus.OK).body(txt).build();
 	}
 
