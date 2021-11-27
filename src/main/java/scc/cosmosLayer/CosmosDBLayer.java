@@ -38,21 +38,21 @@ public class CosmosDBLayer {
 		this.client = client;
 	}
 	
-	private synchronized CosmosContainer getUsersContainer() {
+	public synchronized CosmosContainer getUsersContainer() {
 		if( db != null)
 			return db.getContainer("Users");
 		db = client.getDatabase(DB_NAME);
 		return db.getContainer("Users");
 	}
 
-	private synchronized CosmosContainer getChannelsContainer() {
+	public synchronized CosmosContainer getChannelsContainer() {
 		if( db != null)
 			return db.getContainer("Channels");
 		db = client.getDatabase(DB_NAME);
 		return db.getContainer("Channels");
 	}
 
-	private synchronized CosmosContainer getMessagesContainer() {
+	public synchronized CosmosContainer getMessagesContainer() {
 		if( db != null)
 			return db.getContainer("Messages");
 		db = client.getDatabase(DB_NAME);

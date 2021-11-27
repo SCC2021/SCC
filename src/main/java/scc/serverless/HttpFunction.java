@@ -2,12 +2,17 @@ package scc.serverless;
 
 import java.util.*;
 
+import com.azure.cosmos.CosmosContainer;
+import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.util.CosmosPagedIterable;
 import com.microsoft.azure.functions.annotation.*;
 
 import redis.clients.jedis.Jedis;
 import scc.cache.RedisCache;
 
 import com.microsoft.azure.functions.*;
+import scc.cosmosLayer.CosmosDBLayer;
+import scc.models.UserDAO;
 
 /**
  * Azure Functions with HTTP Trigger. These functions can be accessed at:
@@ -115,24 +120,19 @@ public class HttpFunction {
 		return request.createResponseBuilder(HttpStatus.OK).body(txt).build();
 	}
 
-	@FunctionName("echo-simple")
-	public HttpResponseMessage echoSimple(@HttpTrigger(name = "req", 
-											methods = {HttpMethod.GET }, 
-											authLevel = AuthorizationLevel.ANONYMOUS, 
-											route = "serverless/echosimple/{text}") 
-				HttpRequestMessage<Optional<String>> request,
-				@BindingName("text") String txt, 
-				final ExecutionContext context) {
-		return request.createResponseBuilder(HttpStatus.OK).body(txt).build();
-	}
-
 	@FunctionName("clean-deleted_channels")
 	public HttpResponseMessage cleanDeletedChannels(@HttpTrigger(name = "req",
-			methods = {HttpMethod.POST},
+			methods = {HttpMethod.GET},
 			authLevel = AuthorizationLevel.ANONYMOUS,
-			route = "rest/users")
+			route = "rest/users/{id}")
 												  HttpRequestMessage<Optional<String>> request,
-										  final ExecutionContext context) {
-		return request.createResponseBuilder(HttpStatus.OK).body("User was added.").build();
+													@BindingName("id") String id,
+
+													final ExecutionContext context) {
+		CosmosDBLayer db = CosmosDBLayer.getInstance();
+		CosmosContainer users = db.getUsersContainer();
+		CosmosPagedIterable<UserDAO> output = users.queryItems("SELECT * FROM Users WHERE Users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);
+
+		return request.createResponseBuilder(HttpStatus.OK).body(output.toString()).build();
 	}
 }
