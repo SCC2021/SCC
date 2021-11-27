@@ -11,7 +11,7 @@ import com.microsoft.azure.functions.*;
  * Azure Functions with Timer Trigger.
  */
 public class TimerFunction {
-    @FunctionName("periodic-compute")
+    //@FunctionName("periodic-compute")
     public void cosmosFunction( @TimerTrigger(name = "periodicSetTime", 
     								schedule = "30 */1 * * * *") 
     				String timerInfo,
