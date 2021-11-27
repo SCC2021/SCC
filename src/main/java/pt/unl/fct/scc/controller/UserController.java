@@ -19,12 +19,21 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    /**
+     * GET "/"
+     * @return
+     */
     @GetMapping
     public ResponseEntity<?> getUsers(){
         CosmosPagedIterable res = userService.getUsers();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    /**
+     * POST "/"
+     * @param user
+     * @return
+     */
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user){
         CosmosItemResponse res;
@@ -36,6 +45,11 @@ public class UserController {
         return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
 
+    /**
+     * DELETE "/id"
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public  ResponseEntity<?> deleteUser(@PathVariable String id){
         CosmosItemResponse res;
@@ -47,6 +61,12 @@ public class UserController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    /**
+     * PUT "/id"
+     * @param id
+     * @param user
+     * @return
+     */
     @PutMapping("/{id}")
     public  ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user){
         CosmosItemResponse res;
@@ -59,6 +79,11 @@ public class UserController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    /**
+     * GET "/id"
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public  ResponseEntity<?> getUserByID(@PathVariable String id){
         Iterator res;
@@ -76,6 +101,11 @@ public class UserController {
         return new ResponseEntity<>(u, HttpStatus.OK);
     }
 
+    /**
+     * GET "/id/channels"
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}/channels")
     public  ResponseEntity<?> getUserChannelsByID(@PathVariable String id){
         Iterator res;

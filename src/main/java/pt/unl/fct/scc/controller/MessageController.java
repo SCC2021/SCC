@@ -10,6 +10,8 @@ import pt.unl.fct.scc.model.Message;
 import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.service.MessageService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/rest/messages")
 public class MessageController {
@@ -19,7 +21,7 @@ public class MessageController {
 
     @GetMapping
     public ResponseEntity<?> getMessages(){
-        CosmosPagedIterable res = messageService.getMessages();
+        List<MessageDAO> res = messageService.getMessages();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -59,13 +61,13 @@ public class MessageController {
 
     @GetMapping("/{id}")
     public  ResponseEntity<?> getMessageByID(@PathVariable String id){
-        Object[] res;
+        MessageDAO res;
         try {
-            res = messageService.getMessageById(id).stream().toArray();
+             res = messageService.getMessageById(id);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (res.length <= 0){
+        if (res == null){
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
