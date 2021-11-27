@@ -29,15 +29,11 @@ public class MessageService {
     }
 
     public CosmosItemResponse<MessageDAO> createMessage(MessageDAO message){
-        jedis.set("msg:" + message.getId(),gson.toJson(message)); //Just stores
-        Long cnt = jedis.lpush("messages:"+message.getChannelDest(),gson.toJson(message)); //Stores in a set for channel
-        Long cnt2 = jedis.lpush("recentMessages",gson.toJson(message)); //Stores in a set for channel
+        Long cnt = jedis.lpush("recentMessages",gson.toJson(message)); //Stores in a set for channel
         if (cnt > 21){
-            jedis.ltrim("messages:"+message.getChannelDest(),0,20);
+            jedis.ltrim("recentMessages" ,0,20);
         }
-        if (cnt2 > 21){
-            jedis.ltrim("recentMessages",0,20);
-        }
+
         return cosmosContainer.createItem(message);
     }
 
@@ -59,8 +55,14 @@ public class MessageService {
     }
 
     public MessageDAO getMessageById( String id) {
-        if (jedis.exists("msg:"+id)){
-            return gson.fromJson(jedis.get("msg:"+id),MessageDAO.class);
+        List<String> messages = jedis.lrange("recentMessages",0,-1);
+        if (messages.size() > 0){
+            for (String s: messages) {
+                MessageDAO msg = gson.fromJson(s,MessageDAO.class);
+                if (msg.getId().equals(id)){
+                    return msg;
+                }
+            }
         }
         CosmosPagedIterable<MessageDAO> res = cosmosContainer.queryItems("SELECT * FROM Messages WHERE Messages.id=\"" + id + "\"", new CosmosQueryRequestOptions(), MessageDAO.class);
         for (MessageDAO m : res){
@@ -71,9 +73,24 @@ public class MessageService {
     }
 
     public CosmosItemResponse<Object> delMessageById(String id) {
-        MessageDAO m = gson.fromJson(jedis.get("msg:"+id),MessageDAO.class);
-        jedis.del("msg:"+id);
-       
+        List<String> messages = jedis.lrange("recentMessages",0,-1);
+        List<MessageDAO> list = new LinkedList<>();
+
+        if (messages.size() > 0){
+            for (String s: messages) {
+                MessageDAO msg = gson.fromJson(s,MessageDAO.class);
+                if (!msg.getId().equals(id)){
+                    list.add(msg);
+                }
+            }
+        }
+
+        jedis.del("recentMessages");
+
+        for (MessageDAO m: list){
+            Long cnt = jedis.lpush("recentMessages",gson.toJson(m));
+        }
+
         PartitionKey key = new PartitionKey( id);
         return cosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
     }
