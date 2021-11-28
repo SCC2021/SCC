@@ -124,14 +124,12 @@ public class HttpFunction {
 	public HttpResponseMessage cleanDeletedChannels(@HttpTrigger(name = "req",
 			methods = {HttpMethod.GET},
 			authLevel = AuthorizationLevel.ANONYMOUS,
-			route = "rest/users/{id}")
+			route = "rest/users")
 												  HttpRequestMessage<Optional<String>> request,
-													@BindingName("id") String id,
-
 													final ExecutionContext context) {
 		CosmosDBLayer db = CosmosDBLayer.getInstance();
 		CosmosContainer users = db.getUsersContainer();
-		CosmosPagedIterable<UserDAO> output = users.queryItems("SELECT * FROM Users WHERE Users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);
+		CosmosPagedIterable<UserDAO> output = users.queryItems("SELECT * FROM Users", new CosmosQueryRequestOptions(), UserDAO.class);
 
 		return request.createResponseBuilder(HttpStatus.OK).body(output.toString()).build();
 	}
