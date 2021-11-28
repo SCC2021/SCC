@@ -1,17 +1,14 @@
 package pt.unl.fct.scc.controller;
 
 import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.util.CosmosPagedIterable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.service.UserService;
 
-import java.util.Iterator;
 import java.util.List;
 
 @RestController

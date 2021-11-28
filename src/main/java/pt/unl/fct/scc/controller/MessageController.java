@@ -1,7 +1,6 @@
 package pt.unl.fct.scc.controller;
 
 import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.util.CosmosPagedIterable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
