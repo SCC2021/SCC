@@ -9,6 +9,9 @@ import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.service.UserService;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -50,8 +53,11 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public  ResponseEntity<?> deleteUser(@PathVariable String id){
+    public  ResponseEntity<?> deleteUser(@PathVariable String id, HttpServletRequest request){
         CosmosItemResponse res;
+        if(!this.CheckUser(request,id)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         try {
             res = userService.delUserById(id);
         }catch (Exception e){
@@ -67,8 +73,11 @@ public class UserController {
      * @return
      */
     @PutMapping("/{id}")
-    public  ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user){
+    public  ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user, HttpServletRequest request){
         CosmosItemResponse res;
+        if(!this.CheckUser(request,id)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         try {
             userService.delUserById(id);
             res = userService.createUser(new UserDAO(user));
@@ -115,5 +124,15 @@ public class UserController {
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res.getChannelIds(), HttpStatus.OK);
+    }
+
+    private boolean CheckUser(HttpServletRequest request, String id){
+        Cookie[] cookies = request.getCookies();
+        String userId = "";
+        for (Cookie c : cookies){
+            userId = c.getValue().split("\\.")[1];
+        }
+
+        return userId.equals(id);
     }
 }

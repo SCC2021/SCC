@@ -6,6 +6,7 @@ import pt.unl.fct.scc.service.AuthService;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.HttpMethod;
 
 public class AuthInterceptor implements HandlerInterceptor {
 
@@ -22,6 +23,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (request.getRequestURI().split("/")[1].equals("login")){
             return true;
         }else {
+            if (request.getRequestURI().split("/")[2].equals("users")){
+                if(request.getMethod().equals(HttpMethod.POST)){
+                    return true;
+                }
+            }
             Cookie[] cookies = request.getCookies();
             if (cookies == null){
                 response.setStatus(401);
