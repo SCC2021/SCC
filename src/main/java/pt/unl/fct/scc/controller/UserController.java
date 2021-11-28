@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.service.UserService;
 
 import java.util.Iterator;
+import java.util.List;
 
 @RestController
 @RequestMapping("/rest/users")
@@ -25,7 +27,7 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<?> getUsers(){
-        CosmosPagedIterable res = userService.getUsers();
+        List<UserDAO> res = userService.getUsers();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -86,19 +88,17 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public  ResponseEntity<?> getUserByID(@PathVariable String id){
-        Iterator res;
+        UserDAO res;
         try {
-            res = userService.getUserById(id).stream().iterator();
+            res = userService.getUserById(id);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (!res.hasNext()){
+        if (res == null){
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
 
-        User u = (User) res.next();
-
-        return new ResponseEntity<>(u, HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     /**
@@ -108,18 +108,15 @@ public class UserController {
      */
     @GetMapping("/{id}/channels")
     public  ResponseEntity<?> getUserChannelsByID(@PathVariable String id){
-        Iterator res;
+        UserDAO res;
         try {
-            res = userService.getUserById(id).stream().iterator();
+            res = userService.getUserById(id);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (!res.hasNext()){
+        if (res == null) {
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
-
-        User u = (User) res.next();
-
-        return new ResponseEntity<>(u.getChannelIds(), HttpStatus.OK);
+        return new ResponseEntity<>(res.getChannelIds(), HttpStatus.OK);
     }
 }
