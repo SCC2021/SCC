@@ -1,23 +1,17 @@
 package pt.unl.fct.scc.controller;
 
 import com.google.gson.Gson;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.scc.model.AuthModel;
-import pt.unl.fct.scc.model.Session;
 import pt.unl.fct.scc.service.AuthService;
 import pt.unl.fct.scc.service.RedisCache;
 import pt.unl.fct.scc.util.GsonMapper;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 @RestController
