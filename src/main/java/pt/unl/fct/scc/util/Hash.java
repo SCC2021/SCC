@@ -1,9 +1,12 @@
 package pt.unl.fct.scc.util;
 
+import org.springframework.stereotype.Service;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+@Service
 public class Hash {
     static MessageDigest md;
 

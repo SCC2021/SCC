@@ -9,7 +9,6 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.ChannelDAO;
-import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.util.GsonMapper;
 
 import java.util.LinkedList;

@@ -10,8 +10,6 @@ import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.util.GsonMapper;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import java.util.LinkedList;
 import java.util.List;
