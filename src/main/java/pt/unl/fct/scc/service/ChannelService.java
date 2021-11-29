@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.util.GsonMapper;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,4 +69,18 @@ public class ChannelService {
         return cosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
     }
 
+    public boolean addUser(String channelId, String user) {
+        ChannelDAO ch = this.getChannelById(channelId);
+        if (ch == null) return false;
+        this.delChannelById(channelId);
+
+        List<String> members = Arrays.asList(ch.getMembers());
+        members.add(ch.getOwner());
+        String[] membersIn = new String[members.size()];
+        ch.setMembers(members.toArray(membersIn));
+
+        this.createChannel(ch);
+
+        return true;
+    }
 }

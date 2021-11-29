@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
+import pt.unl.fct.scc.service.ChannelService;
 import pt.unl.fct.scc.service.UserService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
 @RestController
@@ -19,6 +21,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    ChannelService channelService;
 
     /**
      * GET "/"
@@ -129,6 +134,17 @@ public class UserController {
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res.getChannelIds(), HttpStatus.OK);
+    }
+
+    @PostMapping("/{userId}/subscribe/{channelId}")
+    public ResponseEntity<?> subscribe(@PathVariable String user, @PathVariable String channelId){
+
+        if (!channelService.addUser(channelId, user) || userService.getUserById(user) == null){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        userService.subscibeToChannel(user, channelId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private boolean CheckUser(HttpServletRequest request, String id) {

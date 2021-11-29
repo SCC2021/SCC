@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/rest/login")
 public class AuthController {
     private final AuthService authService;
     private final Gson gson;

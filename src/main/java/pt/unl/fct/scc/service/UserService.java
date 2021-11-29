@@ -12,6 +12,7 @@ import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.util.GsonMapper;
 import pt.unl.fct.scc.util.Hash;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,5 +72,17 @@ public class UserService {
 
         PartitionKey key = new PartitionKey(id);
         return cosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
+    }
+
+    public void subscibeToChannel(String user, String channelId) {
+        UserDAO u = this.getUserById(user);
+
+        List<String> channels = Arrays.asList(u.getChannelIds());
+        channels.add(channelId);
+        String[] channelsIn = new String[channels.size()];
+        u.setChannelIds(channels.toArray(channelsIn));
+
+        this.delUserById(user);
+        this.createUser(u);
     }
 }
