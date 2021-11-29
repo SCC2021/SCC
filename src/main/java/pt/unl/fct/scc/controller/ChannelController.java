@@ -9,7 +9,9 @@ import pt.unl.fct.scc.model.Channel;
 import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.service.ChannelService;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/rest/channels")
@@ -26,12 +28,19 @@ public class ChannelController {
     @PostMapping
     public ResponseEntity<?> createChannel(@RequestBody Channel channel) {
         CosmosItemResponse res;
+
+        channel.setId(UUID.randomUUID().toString());
+        List<String> members = Arrays.asList(channel.getMembers());
+        members.add(channel.getOwner());
+        String[] membersIn = new String[members.size()];
+        channel.setMembers(members.toArray(membersIn));
+
         try {
             res = channelService.createChannel(new ChannelDAO(channel));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(res, HttpStatus.CREATED);
+        return new ResponseEntity<>(channel, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
