@@ -7,11 +7,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class GsonMapper {
     private Gson gson;
-    public GsonMapper(){
+
+    public GsonMapper() {
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
 
         this.gson = builder.create();
     }
-    public Gson getGson(){ return gson; }
+
+    public Gson getGson() {
+        return gson;
+    }
 }
