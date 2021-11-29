@@ -72,7 +72,7 @@ public class ChannelService {
     public boolean addUser(String channelId, String user) {
         ChannelDAO ch = this.getChannelById(channelId);
         if (ch == null) return false;
-        this.delChannelById(channelId);
+        if (ch.isPrivate()) return false;
 
         String[] members = ch.getMembers();
         String[] newMemebers = new String[members.length+1];
@@ -81,9 +81,11 @@ public class ChannelService {
             if (members[i].equals(user)) return false;
             newMemebers[i] = members[i];
         }
+
         newMemebers[members.length] = user;
         ch.setMembers(newMemebers);
 
+        this.delChannelById(channelId);
         this.createChannel(ch);
 
         return true;
