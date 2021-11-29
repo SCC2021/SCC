@@ -9,6 +9,7 @@ import pt.unl.fct.scc.model.Channel;
 import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.service.ChannelService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -28,12 +29,17 @@ public class ChannelController {
     @PostMapping
     public ResponseEntity<?> createChannel(@RequestBody Channel channel) {
         CosmosItemResponse res;
-
         channel.setId(UUID.randomUUID().toString());
-        List<String> members = Arrays.asList(channel.getMembers());
-        members.add(channel.getOwner());
-        String[] membersIn = new String[members.size()];
-        channel.setMembers(members.toArray(membersIn));
+
+
+        String[] members = channel.getMembers();
+        String[] newMemebers = new String[members.length+1];
+
+        for (int i = 0; i < members.length; i++) {
+            newMemebers[i] = members[i];
+        }
+        newMemebers[members.length] = channel.getOwner();
+        channel.setMembers(newMemebers);
 
         try {
             res = channelService.createChannel(new ChannelDAO(channel));

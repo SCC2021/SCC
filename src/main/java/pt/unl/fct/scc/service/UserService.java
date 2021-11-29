@@ -77,10 +77,15 @@ public class UserService {
     public void subscibeToChannel(String user, String channelId) {
         UserDAO u = this.getUserById(user);
 
-        List<String> channels = Arrays.asList(u.getChannelIds());
-        channels.add(channelId);
-        String[] channelsIn = new String[channels.size()];
-        u.setChannelIds(channels.toArray(channelsIn));
+        String[] channelIds = u.getChannelIds();
+        String[] newChannelIds = new String[channelIds.length+1];
+
+        for (int i = 0; i < channelIds.length; i++) {
+            if (channelIds[i].equals(channelId)) return;
+            newChannelIds[i] = channelIds[i];
+        }
+        newChannelIds[channelIds.length] = channelId;
+        u.setChannelIds(newChannelIds);
 
         this.delUserById(user);
         this.createUser(u);
