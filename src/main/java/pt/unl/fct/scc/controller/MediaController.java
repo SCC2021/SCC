@@ -19,21 +19,21 @@ public class MediaController {
     @Autowired
     BlobService blobService;
 
-    @PostMapping(consumes = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-    public ResponseEntity<String> upload(@RequestBody byte[] media){
+    @PostMapping(consumes = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    public ResponseEntity<String> upload(@RequestBody byte[] media) {
         String key = Hash.of(media);
         try {
-            blobService.upload(key,media);
-        }catch (Exception e){
+            blobService.upload(key, media);
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(key, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{id}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<?> download(@PathVariable String id){
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<?> download(@PathVariable String id) {
         byte[] data;
-        try{
+        try {
             data = blobService.download(id);
         } catch (BlobNotFoundException e) {
             return new ResponseEntity<>("File Not Found", HttpStatus.NOT_FOUND);
