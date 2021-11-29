@@ -1,4 +1,4 @@
 package pt.unl.fct.scc.exceptions;
 
-public class BlobNotFoundException extends Exception{
+public class BlobNotFoundException extends Exception {
 }

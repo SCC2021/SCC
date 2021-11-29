@@ -18,8 +18,9 @@ public class AuthService {
         this.redisCache = redisCache;
     }
 
-    public boolean checkAccess(AuthModel authModel){
+    public boolean checkAccess(AuthModel authModel) {
         UserDAO user = userService.getUserById(authModel.getId());
+        if (user == null) return false;
         return (user.getPwd().equals(hash.of(authModel.getPassword())));
     }
 
@@ -27,7 +28,7 @@ public class AuthService {
     public boolean searchSession(String sessioId, String value) {
         System.out.println("HERE!!!");
         String session = redisCache.getFromCache(sessioId);
-        if (session == null){
+        if (session == null) {
             return false;
         }
         return session.equals(value);
