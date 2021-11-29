@@ -28,11 +28,12 @@ public class MessageController {
     public ResponseEntity<?> createMessage(@RequestBody Message message) {
         CosmosItemResponse res;
         try {
-            res = messageService.createMessage(new MessageDAO(message));
+            message.setId();
+            messageService.createMessage(new MessageDAO(message));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(res, HttpStatus.CREATED);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

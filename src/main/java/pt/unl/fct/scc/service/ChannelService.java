@@ -69,10 +69,10 @@ public class ChannelService {
         return cosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
     }
 
-    public boolean addUser(String channelId, String user) {
+    public boolean addUser(String channelId, String user, boolean isSubscribe) {
         ChannelDAO ch = this.getChannelById(channelId);
         if (ch == null) return false;
-        if (ch.isPrivate()) return false;
+        if (ch.isPrivate() && isSubscribe) return false;
 
         String[] members = ch.getMembers();
         String[] newMemebers = new String[members.length+1];

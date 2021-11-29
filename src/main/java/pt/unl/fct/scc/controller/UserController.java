@@ -139,7 +139,7 @@ public class UserController {
 
     @PostMapping("/{userId}/subscribe/{channelId}")
     public ResponseEntity<?> subscribe(@PathVariable String userId, @PathVariable String channelId){
-        if (userService.getUserById(userId) == null || !channelService.addUser(channelId, userId)){
+        if (userService.getUserById(userId) == null || !channelService.addUser(channelId, userId, true)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         userService.subscibeToChannel(userId, channelId);

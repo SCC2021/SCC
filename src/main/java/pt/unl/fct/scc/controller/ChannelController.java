@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.scc.model.Channel;
 import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.service.ChannelService;
+import pt.unl.fct.scc.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,9 @@ import java.util.UUID;
 public class ChannelController {
     @Autowired
     ChannelService channelService;
+
+    @Autowired
+    UserService userService;
 
     @GetMapping
     public ResponseEntity<?> getChannels() {
@@ -84,5 +88,15 @@ public class ChannelController {
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @PostMapping("/{channelId}/add/{userId}")
+    public ResponseEntity<?> addUserToChannel(@PathVariable String channelId, @PathVariable String userId){
+        if (userService.getUserById(userId) == null || !channelService.addUser(channelId, userId, false)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        userService.subscibeToChannel(userId, channelId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
