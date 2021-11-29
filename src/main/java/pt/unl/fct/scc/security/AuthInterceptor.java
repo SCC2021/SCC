@@ -20,10 +20,10 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        if (request.getRequestURI().split("/")[1].equals("login")) {
+        if (request.getRequestURI().split("/")[1].equals("test")) {
             return true;
         } else {
-            if (request.getRequestURI().split("/")[1].equals("test")) return true;
+            if (request.getRequestURI().split("/")[2].equals("login")) return true;
             if (request.getRequestURI().split("/")[2].equals("media")){
                 if (request.getMethod().equals(HttpMethod.POST)) {
                     return true;

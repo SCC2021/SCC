@@ -13,6 +13,7 @@ import pt.unl.fct.scc.util.GsonMapper;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/rest/login")
@@ -20,6 +21,7 @@ public class AuthController {
     private final AuthService authService;
     private final Gson gson;
     private final RedisCache redisCache;
+    private Logger logger = Logger.getLogger(this.getClass().toString());
 
     public AuthController(AuthService authService, GsonMapper gsonMapper, RedisCache redisCache) {
         this.authService = authService;
@@ -29,6 +31,7 @@ public class AuthController {
 
     @PostMapping
     public void login(@RequestBody AuthModel authModel, HttpServletResponse response) {
+        logger.info("Login");
         if (!authService.checkAccess(authModel)) {
             response.setStatus(401);
             return;

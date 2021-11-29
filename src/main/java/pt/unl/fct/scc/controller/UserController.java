@@ -14,11 +14,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/rest/users")
 public class UserController {
-
+    Logger logger = Logger.getLogger(this.getClass().toString());
     @Autowired
     UserService userService;
 
@@ -137,12 +138,11 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/subscribe/{channelId}")
-    public ResponseEntity<?> subscribe(@PathVariable String user, @PathVariable String channelId){
-
-        if (!channelService.addUser(channelId, user) || userService.getUserById(user) == null){
+    public ResponseEntity<?> subscribe(@PathVariable String userId, @PathVariable String channelId){
+        if (userService.getUserById(userId) == null || !channelService.addUser(channelId, userId)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        userService.subscibeToChannel(user, channelId);
+        userService.subscibeToChannel(userId, channelId);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

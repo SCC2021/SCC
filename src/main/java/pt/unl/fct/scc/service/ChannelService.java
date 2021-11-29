@@ -72,13 +72,20 @@ public class ChannelService {
     public boolean addUser(String channelId, String user) {
         ChannelDAO ch = this.getChannelById(channelId);
         if (ch == null) return false;
+        if (ch.isPrivate()) return false;
+
+        String[] members = ch.getMembers();
+        String[] newMemebers = new String[members.length+1];
+
+        for (int i = 0; i < members.length; i++) {
+            if (members[i].equals(user)) return false;
+            newMemebers[i] = members[i];
+        }
+
+        newMemebers[members.length] = user;
+        ch.setMembers(newMemebers);
+
         this.delChannelById(channelId);
-
-        List<String> members = Arrays.asList(ch.getMembers());
-        members.add(ch.getOwner());
-        String[] membersIn = new String[members.size()];
-        ch.setMembers(members.toArray(membersIn));
-
         this.createChannel(ch);
 
         return true;
