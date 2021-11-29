@@ -1,7 +1,6 @@
 package pt.unl.fct.scc.controller;
 
 import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.util.CosmosPagedIterable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.scc.model.Channel;
 import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.service.ChannelService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/rest/channels")
@@ -18,7 +19,7 @@ public class ChannelController {
 
     @GetMapping
     public ResponseEntity<?> getChannels(){
-        CosmosPagedIterable res = channelService.getChannels();
+        List<ChannelDAO> res = channelService.getChannels();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -58,13 +59,13 @@ public class ChannelController {
 
     @GetMapping("/{id}")
     public  ResponseEntity<?> getChannelByID(@PathVariable String id){
-        Object[] res;
+        ChannelDAO res;
         try {
-            res = channelService.getChannelById(id).stream().toArray();
+            res = channelService.getChannelById(id);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (res.length <= 0){
+        if (res == null){
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
