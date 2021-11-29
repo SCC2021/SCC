@@ -25,11 +25,11 @@ public class BlobService {
     private BlobContainerClient blobContainerClient;
 
     @PostConstruct
-    public void init() {
+    public void init(){
         this.blobContainerClient = container();
     }
 
-    private BlobContainerClient container() {
+    private BlobContainerClient container(){
         logger.info("url: " + azureUrl);
         logger.info("container: " + containerName);
 
@@ -38,14 +38,14 @@ public class BlobService {
         return containerClient;
     }
 
-    private BlobClient getClient(String key) {
+    private BlobClient getClient(String key){
         return this.blobContainerClient.getBlobClient(key);
     }
 
-    public void upload(String key, byte[] data) {
+    public void upload(String key, byte[] data){
         BlobClient client = getClient(key);
         BinaryData bdata = BinaryData.fromBytes(data);
-        if (!client.exists()) {
+        if (!client.exists()){
             client.upload(bdata);
         }
     }

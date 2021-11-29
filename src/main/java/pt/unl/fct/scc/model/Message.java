@@ -17,7 +17,7 @@ public class Message {
     private String body;
     private String mediaId;
 
-    public void setId() {
+    public void setId(){
         UUID uid = UUID.randomUUID();
         this.id = uid.toString();
     }

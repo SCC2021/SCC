@@ -22,11 +22,11 @@ public class CosmosDBService {
     private String dbName;
 
     @PostConstruct
-    private void init() {
-        this.client = new CosmosClientBuilder()
+    private void init(){
+        this.client =  new CosmosClientBuilder()
                 .endpoint(azureUrl)
                 .key(primaryKey)
-                .gatewayMode()        // replace by .directMode() for better performance
+                .gatewayMode()		// replace by .directMode() for better performance
                 .consistencyLevel(ConsistencyLevel.SESSION)
                 .connectionSharingAcrossClientsEnabled(true)
                 .contentResponseOnWriteEnabled(true)
@@ -35,7 +35,7 @@ public class CosmosDBService {
         this.db = client.getDatabase(dbName);
     }
 
-    public CosmosContainer getContainer(String containerName) {
+    public CosmosContainer getContainer(String containerName){
         return db.getContainer(containerName);
     }
 

@@ -16,7 +16,7 @@ public class ChannelDAO {
     private String owner;
     private String[] members;
 
-    public ChannelDAO(Channel channel) {
+    public ChannelDAO(Channel channel){
         this.id = channel.getId();
         this.name = channel.getName();
         this.isPrivate = channel.isPrivate();

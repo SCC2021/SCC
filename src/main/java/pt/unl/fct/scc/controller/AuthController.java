@@ -21,24 +21,24 @@ public class AuthController {
     private final Gson gson;
     private final RedisCache redisCache;
 
-    public AuthController(AuthService authService, GsonMapper gsonMapper, RedisCache redisCache) {
-        this.authService = authService;
+    public AuthController(AuthService authService, GsonMapper gsonMapper, RedisCache redisCache){
+        this.authService=authService;
         this.gson = gsonMapper.getGson();
         this.redisCache = redisCache;
     }
 
     @PostMapping
-    public void login(@RequestBody AuthModel authModel, HttpServletResponse response) {
-        if (!authService.checkAccess(authModel)) {
+    public void login(@RequestBody AuthModel authModel, HttpServletResponse response){
+        if (!authService.checkAccess(authModel)){
             response.setStatus(401);
-            return;
+            return ;
         }
         UUID sessionId = UUID.randomUUID();
-        String sessionValue = sessionId.toString() + "." + authModel.getId();
+        String sessionValue = sessionId.toString()+"."+authModel.getId();
 
-        redisCache.storeInCache(sessionId.toString(), sessionValue);
+        redisCache.storeInCache(sessionId.toString(),sessionValue);
 
-        Cookie c = new Cookie("scc.session", sessionValue);
+        Cookie c = new Cookie("scc.session",sessionValue);
         c.setSecure(false);
         c.setComment("sessionId");
         c.setHttpOnly(true);

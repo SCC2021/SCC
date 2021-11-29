@@ -14,7 +14,7 @@ public class MessageDAO {
     private String id;
 
 
-    public MessageDAO(Message m) {
+    public MessageDAO(Message m){
         this.user = m.getUser();
         this.channelDest = m.getChannelDest();
         this.mediaId = m.getMediaId();

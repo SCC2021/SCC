@@ -11,6 +11,7 @@ import pt.unl.fct.scc.service.UserService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -22,27 +23,25 @@ public class UserController {
 
     /**
      * GET "/"
-     *
      * @return
      */
     @GetMapping
-    public ResponseEntity<?> getUsers() {
+    public ResponseEntity<?> getUsers(){
         List<UserDAO> res = userService.getUsers();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     /**
      * POST "/"
-     *
      * @param user
      * @return
      */
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody User user){
         CosmosItemResponse res;
         try {
             res = userService.createUser(new UserDAO(user));
-        } catch (Exception e) {
+        }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(res, HttpStatus.CREATED);
@@ -50,19 +49,18 @@ public class UserController {
 
     /**
      * DELETE "/id"
-     *
      * @param id
      * @return
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id, HttpServletRequest request) {
+    public  ResponseEntity<?> deleteUser(@PathVariable String id, HttpServletRequest request){
         CosmosItemResponse res;
-        if (!this.CheckUser(request, id)) {
+        if(!this.CheckUser(request,id)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         try {
             res = userService.delUserById(id);
-        } catch (Exception e) {
+        }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
@@ -70,21 +68,20 @@ public class UserController {
 
     /**
      * PUT "/id"
-     *
      * @param id
      * @param user
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user, HttpServletRequest request) {
+    public  ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user, HttpServletRequest request){
         CosmosItemResponse res;
-        if (!this.CheckUser(request, id)) {
+        if(!this.CheckUser(request,id)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         try {
             userService.delUserById(id);
             res = userService.createUser(new UserDAO(user));
-        } catch (Exception e) {
+        }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
@@ -92,19 +89,18 @@ public class UserController {
 
     /**
      * GET "/id"
-     *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserByID(@PathVariable String id) {
+    public  ResponseEntity<?> getUserByID(@PathVariable String id){
         UserDAO res;
         try {
             res = userService.getUserById(id);
-        } catch (Exception e) {
+        }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (res == null) {
+        if (res == null){
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
 
@@ -113,16 +109,15 @@ public class UserController {
 
     /**
      * GET "/id/channels"
-     *
      * @param id
      * @return
      */
     @GetMapping("/{id}/channels")
-    public ResponseEntity<?> getUserChannelsByID(@PathVariable String id) {
+    public  ResponseEntity<?> getUserChannelsByID(@PathVariable String id){
         UserDAO res;
         try {
             res = userService.getUserById(id);
-        } catch (Exception e) {
+        }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (res == null) {
@@ -131,10 +126,10 @@ public class UserController {
         return new ResponseEntity<>(res.getChannelIds(), HttpStatus.OK);
     }
 
-    private boolean CheckUser(HttpServletRequest request, String id) {
+    private boolean CheckUser(HttpServletRequest request, String id){
         Cookie[] cookies = request.getCookies();
         String userId = "";
-        for (Cookie c : cookies) {
+        for (Cookie c : cookies){
             userId = c.getValue().split("\\.")[1];
         }
 
