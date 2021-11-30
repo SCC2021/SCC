@@ -54,6 +54,20 @@ public class CosmosDBLayer {
         return db.getContainer("Messages");
     }
 
+    public synchronized CosmosContainer getDeletedUsersContainer() {
+        if (db != null)
+            return db.getContainer("Deleted Users");
+        db = client.getDatabase(DB_NAME);
+        return db.getContainer("Deleted Users");
+    }
+
+    public synchronized CosmosContainer getDeletedChannelsContainer() {
+        if (db != null)
+            return db.getContainer("Deleted Channels");
+        db = client.getDatabase(DB_NAME);
+        return db.getContainer("Deleted Channels");
+    }
+
 
 	/*public CosmosItemResponse<Object> delUserById(String id) {
 		getUsersContainer();

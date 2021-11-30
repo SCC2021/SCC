@@ -58,51 +58,6 @@ public class HttpFunction {
         return request.createResponseBuilder(HttpStatus.OK).body(result.toString()).build();
     }
 
-    @FunctionName("get-redis")
-    public HttpResponseMessage getRedis(@HttpTrigger(name = "req",
-            methods = {HttpMethod.GET},
-            authLevel = AuthorizationLevel.ANONYMOUS,
-            route = "serverless/redis/{key}")
-                                                HttpRequestMessage<Optional<String>> request,
-                                        @BindingName("key") String key,
-                                        final ExecutionContext context) {
-//		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-//			jedis.incr("cnt:http");
-//			String val = jedis.get(key);
-//		}
-        return request.createResponseBuilder(HttpStatus.OK).body("GET key = " + key + "; val = ").build();
-    }
-
-    @FunctionName("lrange-redis")
-    public HttpResponseMessage lrangeRedis(@HttpTrigger(name = "req",
-            methods = {HttpMethod.GET},
-            authLevel = AuthorizationLevel.ANONYMOUS,
-            route = "serverless/redis/lrange/{key}")
-                                                   HttpRequestMessage<Optional<String>> request,
-                                           @BindingName("key") String key,
-                                           final ExecutionContext context) {
-//		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-//			jedis.incr("cnt:http");
-//			List<String> val = jedis.lrange(key, 0, -1);
-//		}
-        return request.createResponseBuilder(HttpStatus.OK).body("GET key = " + key + "; val = ").build();
-    }
-
-    @FunctionName("set-redis")
-    public HttpResponseMessage setRedis(@HttpTrigger(name = "req",
-            methods = {HttpMethod.POST},
-            authLevel = AuthorizationLevel.ANONYMOUS,
-            route = "serverless/redis/{key}")
-                                                HttpRequestMessage<Optional<String>> request,
-                                        @BindingName("key") String key,
-                                        final ExecutionContext context) {
-        String val = request.getBody().orElse("");
-//		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-//			jedis.incr("cnt:http");
-//			jedis.set(key, val);
-//		}
-        return request.createResponseBuilder(HttpStatus.OK).body("SET key = " + key + "; val = " + val).build();
-    }
 
     @FunctionName("trending-channels")
     public HttpResponseMessage calculateTrendingChannels(@HttpTrigger(name = "req",
