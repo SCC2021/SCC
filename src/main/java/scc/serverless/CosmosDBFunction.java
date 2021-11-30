@@ -24,8 +24,8 @@ import java.util.List;
  */
 public class CosmosDBFunction {
 
-    private final String database_name = "scc52698db";
-    private final String connectionStringSetting = "";
+    private final String database_name = "scc52919db";
+    private final String connectionStringSetting = "AccountEndpoint=https://scc52919.documents.azure.com:443/;AccountKey=n1iU4IqOoR2Czht6WMHbQzGH0MxnPMCQ9nHHAKqm7FTHSa0caUriL9tGLIBKnVH6UQUx7KJLIYCxm22J6gqJ5w==;";
 
 
     /**
@@ -33,8 +33,8 @@ public class CosmosDBFunction {
      */
     @FunctionName("clean-deleted-users")
     public void cleanDeletedUsers(@CosmosDBTrigger(name = "cleanDeletedUsers",
-            databaseName = "scc52698db",
-            collectionName = "deleted_users",
+            databaseName = database_name,
+            collectionName = "DeletedUsers",
             createLeaseCollectionIfNotExists = true,
             connectionStringSetting = connectionStringSetting)
                                           String[] deleted_users,
@@ -82,8 +82,8 @@ public class CosmosDBFunction {
      */
     @FunctionName("clean-deleted-channels")
     public void cleanDeletedChannels(@CosmosDBTrigger(name = "cleanDeletedUsers",
-            databaseName = "scc52698db",
-            collectionName = "deleted_channels",
+            databaseName = database_name,
+            collectionName = "DeletedChannels",
             createLeaseCollectionIfNotExists = true,
             connectionStringSetting = connectionStringSetting)
                                           String[] deleted_channels,

@@ -12,11 +12,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>11</java.version>
-        <functionAppName>sscfunctions52698</functionAppName>
+        <java.version>8</java.version>
+        <functionAppName>scc52919Functions</functionAppName>
         <functionAppRegion>westeurope</functionAppRegion>
         <functionPricingTier>B1</functionPricingTier>
-        <functionResourceGroup>scc-52698-rg</functionResourceGroup>
+        <functionResourceGroup>scc-backend-rg-52919</functionResourceGroup>
     </properties>
 
     <dependencies>
@@ -100,8 +100,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>8</source>
+                    <target>8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
@@ -111,9 +111,9 @@
                 <version>1.14.1</version>
                 <configuration>
                     <!-- function app name -->
-                    <appName>sscfunctions52698 </appName>
+                    <appName>scc52919Functions</appName>
                     <!-- function app resource group -->
-                    <resourceGroup>scc-52698-rg</resourceGroup>
+                    <resourceGroup>scc-backend-rg-52919</resourceGroup>
                     <!-- function app service plan name -->
                     <!-- <appServicePlanName>java-functions-app-service-plan</appServicePlanName> -->
                     <!-- function app region-->
@@ -128,7 +128,7 @@
                     <runtime>
                         <!-- runtime os, could be windows, linux or docker-->
                         <os>windows</os>
-                        <javaVersion>11</javaVersion>
+                        <javaVersion>8</javaVersion>
                     </runtime>
                     <appSettings>
                         <property>

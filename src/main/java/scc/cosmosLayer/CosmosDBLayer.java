@@ -3,9 +3,9 @@ package scc.cosmosLayer;
 import com.azure.cosmos.*;
 
 public class CosmosDBLayer {
-    private static final String CONNECTION_URL = "https://scc52698db.documents.azure.com:443/";
-    private static final String DB_KEY = "tVVosAfw3tJSCzmmet8pA7V01bNRQHuXIbqrB1qYsFAJymyN2wJdUeg91p8McFli220dmvPEYzLNkdUecmUKAQ==";
-    private static final String DB_NAME = "scc52698db";
+    private static final String CONNECTION_URL = "https://scc52919.documents.azure.com:443/";
+    private static final String DB_KEY = "n1iU4IqOoR2Czht6WMHbQzGH0MxnPMCQ9nHHAKqm7FTHSa0caUriL9tGLIBKnVH6UQUx7KJLIYCxm22J6gqJ5w==";
+    private static final String DB_NAME = "scc52919db";
 
     private static CosmosDBLayer instance;
 
