@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.Channel;
 import pt.unl.fct.scc.model.ChannelDAO;
+import pt.unl.fct.scc.model.DeletedDAO;
 import pt.unl.fct.scc.util.GsonMapper;
 
 import java.util.LinkedList;
@@ -63,10 +64,10 @@ public class ChannelService {
 
     public CosmosItemResponse<Object> delChannelById(String id) {
         redisCache.deleteChannelFromCacheList(CACHE_LIST, id);
-
-        PartitionKey key = new PartitionKey(id);
-        deletedChannelsCosmosContainer.createItem(id);
-        return channelsCosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
+        DeletedDAO deletedDAO = new DeletedDAO();
+        deletedDAO.setId(id);
+        deletedChannelsCosmosContainer.createItem(deletedDAO);
+        return channelsCosmosContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 
     public boolean addUser(String channelId, String user, boolean isSubscribe) {

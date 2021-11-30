@@ -6,6 +6,7 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.Channel;
+import pt.unl.fct.scc.model.DeletedDAO;
 import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.util.GsonMapper;
@@ -69,9 +70,11 @@ public class UserService {
 
     public CosmosItemResponse<Object> delUserById(String id) {
         redisCache.deleteUserFromCacheList(CACHE_LIST, id);
-        PartitionKey key = new PartitionKey(id);
-        deletedUsersCosmosContainer.createItem(id);
-        return usersCosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
+        DeletedDAO deleted = new DeletedDAO();
+        deleted.setId(id);
+        deletedUsersCosmosContainer.createItem(deleted);
+        System.out.println("Added to deleted DB");
+        return usersCosmosContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 
     public void subscibeToChannel(String user, String channelId) {
