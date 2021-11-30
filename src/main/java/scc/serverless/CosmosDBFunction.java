@@ -47,6 +47,7 @@ public class CosmosDBFunction {
         CosmosPagedIterable<ChannelDAO> channels_list = channels_container.queryItems("SELECT * FROM Channels", new CosmosQueryRequestOptions(), ChannelDAO.class);
         CosmosPagedIterable<MessageDAO> messages_list = messages_container.queryItems("SELECT * FROM Messages", new CosmosQueryRequestOptions(), MessageDAO.class);
 
+        // Lists the deleted_users container and clears it.
         List<UserDAO> deleted_users_list = new ArrayList<>();
         for (String deleted_user_str : deleted_users) {
             UserDAO usr = gson.fromJson(deleted_user_str, UserDAO.class);
@@ -54,7 +55,7 @@ public class CosmosDBFunction {
             deleted_users_container.deleteItem(usr.getId(), new PartitionKey(usr.getId()), new CosmosItemRequestOptions());
         }
 
-
+        // Iterates through all channels clearing the deleted users' ids from the members array.
         for (ChannelDAO channel : channels_list) {
             boolean removed = false;
             CosmosPatchOperations op = CosmosPatchOperations.create();
@@ -68,6 +69,7 @@ public class CosmosDBFunction {
             }
         }
 
+        // Iterates through all messages, changing the sender name to "Deleted User" if the user was deleted.
         for (MessageDAO message : messages_list)
             if (deleted_users_list.contains(message.getUser())) {
                 CosmosPatchOperations op = CosmosPatchOperations.create().replace("/user", "Deleted User");
@@ -76,7 +78,7 @@ public class CosmosDBFunction {
     }
 
     /**
-     * Cleans the deleted members from the affected channels.
+     * Cleans the deleted channels from the affected users.
      */
     @FunctionName("clean-deleted-channels")
     public void cleanDeletedChannels(@CosmosDBTrigger(name = "cleanDeletedUsers",
@@ -92,6 +94,7 @@ public class CosmosDBFunction {
         CosmosContainer users_container = db.getUsersContainer();
         CosmosPagedIterable<UserDAO> users_list = users_container.queryItems("SELECT * FROM Users", new CosmosQueryRequestOptions(), UserDAO.class);
 
+        // Lists the deleted_channels container and clears it.
         List<ChannelDAO> deleted_channels_list = new ArrayList<>();
         for (String deleted_channel_str : deleted_channels) {
             ChannelDAO chn = gson.fromJson(deleted_channel_str, ChannelDAO.class);
@@ -99,7 +102,7 @@ public class CosmosDBFunction {
             deleted_channels_container.deleteItem(chn.getId(), new PartitionKey(chn.getId()), new CosmosItemRequestOptions());
         }
 
-
+        // Iterates through all users and clears the deleted-channel's ids.
         for (UserDAO user : users_list) {
             boolean removed = false;
             CosmosPatchOperations op = CosmosPatchOperations.create();
