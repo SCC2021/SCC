@@ -1,25 +1,24 @@
 package pt.unl.fct.scc.service;
 
 import com.azure.cosmos.CosmosContainer;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
-import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.PartitionKey;
+import com.azure.cosmos.models.*;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.scc.model.Channel;
+import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.util.GsonMapper;
 import pt.unl.fct.scc.util.Hash;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 @Service
 public class UserService {
 
-    CosmosContainer cosmosContainer;
+    CosmosContainer usersCosmosContainer;
+    CosmosContainer deletedUsersCosmosContainer;
     private final Gson gson;
     private final RedisCache redisCache;
     private final String CACHE_LIST = "recentUsers";
@@ -27,7 +26,8 @@ public class UserService {
 
 
     public UserService(CosmosDBService cosmosDBService, RedisCache redisCache, GsonMapper gsonMapper, Hash hash) {
-        this.cosmosContainer = cosmosDBService.getContainer("Users");
+        this.usersCosmosContainer = cosmosDBService.getContainer("Users");
+        this.deletedUsersCosmosContainer = cosmosDBService.getContainer("DeletedUsers");
         this.gson = gsonMapper.getGson();
         this.redisCache = redisCache;
         this.hash = hash;
@@ -36,7 +36,7 @@ public class UserService {
     public CosmosItemResponse<UserDAO> createUser(UserDAO user) {
         user.setPwd(hash.of(user.getPwd()));
         redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
-        return cosmosContainer.createItem(user);
+        return usersCosmosContainer.createItem(user);
     }
 
     public List<UserDAO> getUsers() {
@@ -45,7 +45,7 @@ public class UserService {
             return list;
         }
 
-        CosmosPagedIterable<UserDAO> res = cosmosContainer.queryItems("SELECT * FROM Users ", new CosmosQueryRequestOptions(), UserDAO.class);
+        CosmosPagedIterable<UserDAO> res = usersCosmosContainer.queryItems("SELECT * FROM Users ", new CosmosQueryRequestOptions(), UserDAO.class);
 
         List<UserDAO> ret = new LinkedList<>();
         for (UserDAO m : res) {
@@ -60,7 +60,7 @@ public class UserService {
             return cache;
         }
 
-        CosmosPagedIterable<UserDAO> res = cosmosContainer.queryItems("SELECT * FROM Users WHERE Users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);
+        CosmosPagedIterable<UserDAO> res = usersCosmosContainer.queryItems("SELECT * FROM Users WHERE Users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);
         for (UserDAO m : res) {
             return m; // There should only be one message with the ID
         }
@@ -69,9 +69,9 @@ public class UserService {
 
     public CosmosItemResponse<Object> delUserById(String id) {
         redisCache.deleteUserFromCacheList(CACHE_LIST, id);
-
         PartitionKey key = new PartitionKey(id);
-        return cosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
+        deletedUsersCosmosContainer.createItem(id);
+        return usersCosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
     }
 
     public void subscibeToChannel(String user, String channelId) {
@@ -87,7 +87,19 @@ public class UserService {
         newChannelIds[channelIds.length] = channelId;
         u.setChannelIds(newChannelIds);
 
-        this.delUserById(user);
-        this.createUser(u);
+        CosmosPatchOperations op = CosmosPatchOperations.create().replace("/channelIds",newChannelIds);
+        usersCosmosContainer.patchItem(user,new PartitionKey(user),op,UserDAO.class);
+
+        redisCache.deleteChannelFromCacheList(CACHE_LIST,channelId);
+        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(u), 20);
+
     }
+
+    public void updateUser(User user){
+        usersCosmosContainer.replaceItem(user, user.getId(), new PartitionKey(user.getId()), new CosmosItemRequestOptions());
+
+        redisCache.deleteUserFromCacheList(CACHE_LIST, user.getId());
+        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
+    }
+
 }

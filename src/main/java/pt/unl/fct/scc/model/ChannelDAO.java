@@ -12,14 +12,14 @@ public class ChannelDAO {
     private String _ts;
     private String id;
     private String name;
-    private boolean isPrivate;
+    private boolean priv;
     private String owner;
     private String[] members;
 
     public ChannelDAO(Channel channel) {
         this.id = channel.getId();
         this.name = channel.getName();
-        this.isPrivate = channel.isPrivate();
+        this.priv = channel.isPriv();
         this.owner = channel.getOwner();
         this.members = channel.getMembers();
     }

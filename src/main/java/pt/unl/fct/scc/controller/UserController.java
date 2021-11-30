@@ -88,12 +88,11 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         try {
-            userService.delUserById(id);
-            res = userService.createUser(new UserDAO(user));
+            userService.updateUser(user);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
