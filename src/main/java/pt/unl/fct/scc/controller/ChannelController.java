@@ -68,12 +68,11 @@ public class ChannelController {
     public ResponseEntity<?> updateChannel(@PathVariable String id, @RequestBody Channel channel) {
         CosmosItemResponse res;
         try {
-            channelService.delChannelById(id);
-            res = channelService.createChannel(new ChannelDAO(channel));
+            channelService.updateChannel(channel);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(channel, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

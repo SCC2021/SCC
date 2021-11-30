@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class Channel {
     private String id;
     private String name;
-    private boolean isPrivate;
+    private boolean priv;
     private String owner;
     private String[] members;
 }

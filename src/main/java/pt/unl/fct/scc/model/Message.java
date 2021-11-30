@@ -3,7 +3,9 @@ package pt.unl.fct.scc.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.tomcat.jni.Local;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -16,10 +18,15 @@ public class Message {
     private String user;
     private String body;
     private String mediaId;
+    private LocalDate sentAt;
 
     public void setId() {
         UUID uid = UUID.randomUUID();
         this.id = uid.toString();
+    }
+
+    public void setSent(){
+        this.sentAt = LocalDate.now();
     }
 
 }
