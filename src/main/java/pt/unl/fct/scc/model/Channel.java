@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,5 +14,5 @@ public class Channel {
     private String name;
     private boolean priv;
     private String owner;
-    private String[] members;
+    private List<String> members;
 }

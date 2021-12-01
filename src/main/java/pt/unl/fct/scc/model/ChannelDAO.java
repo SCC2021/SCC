@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +16,7 @@ public class ChannelDAO {
     private String name;
     private boolean priv;
     private String owner;
-    private String[] members;
+    private List<String> members;
 
     public ChannelDAO(Channel channel) {
         this.id = channel.getId();

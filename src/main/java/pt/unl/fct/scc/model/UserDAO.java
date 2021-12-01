@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,13 +16,13 @@ public class UserDAO {
     private String name;
     private String pwd;
     private String photoId;
-    private String[] channelIds;
+    private List<String> channelIds;
 
     public UserDAO(User u) {
         this(u.getId(), u.getName(), u.getPwd(), u.getPhotoId(), u.getChannelIds());
     }
 
-    public UserDAO(String id, String name, String pwd, String photoId, String[] channelIds) {
+    public UserDAO(String id, String name, String pwd, String photoId, List<String> channelIds) {
         super();
         this.id = id;
         this.name = name;
