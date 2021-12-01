@@ -26,7 +26,6 @@ public class AuthService {
 
 
     public boolean searchSession(String sessioId, String value) {
-        System.out.println("HERE!!!");
         String session = redisCache.getFromCache(sessioId);
         if (session == null) {
             return false;
