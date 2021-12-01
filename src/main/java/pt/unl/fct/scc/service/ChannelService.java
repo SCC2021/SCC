@@ -75,18 +75,11 @@ public class ChannelService {
         if (ch == null) return false;
         if (ch.isPriv() && isSubscribe) return false;
 
-        String[] members = ch.getMembers();
-        String[] newMemebers = new String[members.length+1];
+        List<String> members = ch.getMembers();
+        members.add(user);
+        ch.setMembers(members);
 
-        for (int i = 0; i < members.length; i++) {
-            if (members[i].equals(user)) return false;
-            newMemebers[i] = members[i];
-        }
-
-        newMemebers[members.length] = user;
-        ch.setMembers(newMemebers);
-
-        CosmosPatchOperations op = CosmosPatchOperations.create().replace("/members",newMemebers);
+        CosmosPatchOperations op = CosmosPatchOperations.create().replace("/members",members);
         channelsCosmosContainer.patchItem(channelId,new PartitionKey(channelId),op, ChannelDAO.class);
 
         redisCache.deleteUserFromCacheList(CACHE_LIST, user);

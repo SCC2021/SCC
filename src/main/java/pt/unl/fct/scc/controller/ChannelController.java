@@ -10,10 +10,7 @@ import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.service.ChannelService;
 import pt.unl.fct.scc.service.UserService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/rest/channels")
@@ -34,16 +31,9 @@ public class ChannelController {
     public ResponseEntity<?> createChannel(@RequestBody Channel channel) {
         CosmosItemResponse res;
         channel.setId(UUID.randomUUID().toString());
-
-
-        String[] members = channel.getMembers();
-        String[] newMemebers = new String[members.length+1];
-
-        for (int i = 0; i < members.length; i++) {
-            newMemebers[i] = members[i];
-        }
-        newMemebers[members.length] = channel.getOwner();
-        channel.setMembers(newMemebers);
+        String owner = channel.getOwner();
+        if (channel.getMembers() == null) channel.setMembers(new LinkedList<String>());
+        channel.getMembers().add(owner == null ? "":owner);
 
         try {
             res = channelService.createChannel(new ChannelDAO(channel));
