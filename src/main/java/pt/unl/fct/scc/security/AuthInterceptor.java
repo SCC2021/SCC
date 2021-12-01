@@ -23,6 +23,10 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (request.getRequestURI().split("/")[1].equals("test")) {
             return true;
         } else {
+            if (request.getRequestURI().split("/").length < 3){
+                response.setStatus(404);
+                return false;
+            }
             if (request.getRequestURI().split("/")[2].equals("login")) return true;
             if (request.getRequestURI().split("/")[2].equals("media")){
                 if (request.getMethod().equals(HttpMethod.POST)) {
