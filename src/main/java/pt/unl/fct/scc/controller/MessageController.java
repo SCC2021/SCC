@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.model.Message;
 import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.service.MessageService;
@@ -88,5 +89,11 @@ public class MessageController {
         }
 
         return userId.equals(id);
+    }
+
+    @GetMapping("/trending")
+    public ResponseEntity<?> getTrendingChannels() {
+        List<ChannelDAO> res = messageService.getTrendingChannels();
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }
