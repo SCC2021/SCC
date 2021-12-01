@@ -60,7 +60,7 @@ public class MessageService {
         while(it.hasNext() && trending.size() < 4){
             TrendingDAO channel = it.next();
             ChannelDAO cache = redisCache.getChannelFromCacheList("recentChannels", channel.getChannelDest());
-            if (cache != null) {
+            if (cache != null && !cache.isPriv()) {
                 trending.add(cache);
             }
         }
