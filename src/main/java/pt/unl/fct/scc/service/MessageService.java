@@ -27,6 +27,7 @@ public class MessageService {
     }
 
     public CosmosItemResponse<MessageDAO> createMessage(MessageDAO message) {
+        System.out.println(message);
         redisCache.storeInCacheListLimited("recentMessages", gson.toJson(message), 20);
         return cosmosContainer.createItem(message);
     }

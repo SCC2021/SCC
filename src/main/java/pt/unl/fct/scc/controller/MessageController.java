@@ -9,6 +9,8 @@ import pt.unl.fct.scc.model.Message;
 import pt.unl.fct.scc.model.MessageDAO;
 import pt.unl.fct.scc.service.MessageService;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -25,11 +27,15 @@ public class MessageController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createMessage(@RequestBody Message message) {
+    public ResponseEntity<?> createMessage(@RequestBody Message message, HttpServletRequest request) {
         CosmosItemResponse res;
         try {
             message.setId();
             message.setSent();
+            if (!this.CheckUser(request,message.getUser())){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+            System.out.println(message);
             messageService.createMessage(new MessageDAO(message));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -72,5 +78,15 @@ public class MessageController {
             return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    private boolean CheckUser(HttpServletRequest request, String id) {
+        Cookie[] cookies = request.getCookies();
+        String userId = "";
+        for (Cookie c : cookies) {
+            userId = c.getValue().split("\\.")[1];
+        }
+
+        return userId.equals(id);
     }
 }

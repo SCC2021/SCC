@@ -18,7 +18,7 @@ public class Message {
     private String user;
     private String body;
     private String mediaId;
-    private LocalDate sentAt;
+    private long sentAt;
 
     public void setId() {
         UUID uid = UUID.randomUUID();
@@ -26,7 +26,7 @@ public class Message {
     }
 
     public void setSent(){
-        this.sentAt = LocalDate.now();
+        this.sentAt = System.currentTimeMillis();
     }
 
 }
