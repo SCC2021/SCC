@@ -37,6 +37,9 @@ public class UserService {
 
     public CosmosItemResponse<UserDAO> createUser(UserDAO user) {
         user.setPwd(hash.of(user.getPwd()));
+        if (user.getChannelIds() == null){
+            user.setChannelIds(new ArrayList<>());
+        }
         redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
         return usersCosmosContainer.createItem(user);
     }

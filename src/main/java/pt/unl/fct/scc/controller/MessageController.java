@@ -35,7 +35,6 @@ public class MessageController {
             if (!this.CheckUser(request,message.getUser())){
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
-            System.out.println(message);
             messageService.createMessage(new MessageDAO(message));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
