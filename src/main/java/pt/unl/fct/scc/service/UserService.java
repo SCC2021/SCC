@@ -12,6 +12,7 @@ import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.util.GsonMapper;
 import pt.unl.fct.scc.util.Hash;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,17 +81,12 @@ public class UserService {
     public void subscibeToChannel(String user, String channelId) {
         UserDAO u = this.getUserById(user);
 
-        String[] channelIds = u.getChannelIds();
-        String[] newChannelIds = new String[channelIds.length+1];
+        List<String> channelIds = u.getChannelIds();
+        if (channelIds == null) channelIds = (new ArrayList<>());
+        channelIds.add(channelId);
+        u.setChannelIds(channelIds);
 
-        for (int i = 0; i < channelIds.length; i++) {
-            if (channelIds[i].equals(channelId)) return;
-            newChannelIds[i] = channelIds[i];
-        }
-        newChannelIds[channelIds.length] = channelId;
-        u.setChannelIds(newChannelIds);
-
-        CosmosPatchOperations op = CosmosPatchOperations.create().replace("/channelIds",newChannelIds);
+        CosmosPatchOperations op = CosmosPatchOperations.create().replace("/channelIds",channelIds);
         usersCosmosContainer.patchItem(user,new PartitionKey(user),op,UserDAO.class);
 
         redisCache.deleteChannelFromCacheList(CACHE_LIST,channelId);
