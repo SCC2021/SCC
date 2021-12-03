@@ -3,6 +3,8 @@ package pt.unl.fct.scc.service;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.model.MessageDAO;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @Service
+@Scope("prototype")
 public class RedisCache {
 
     private Logger logger = Logger.getLogger(this.getClass().toString());
