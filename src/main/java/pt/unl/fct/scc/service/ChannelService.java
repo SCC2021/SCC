@@ -61,14 +61,21 @@ public class ChannelService {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("channelID").is(id));
-            return mongoTemplate.find(query, Channel.class).get(0);
+            Channel channel = mongoTemplate.find(query, Channel.class).get(0);
+            if(channel != null)
+                redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(channel), 20);
+            return channel;
         }catch (IndexOutOfBoundsException e){
             return null;
         }
     }
 
     public void delChannelById(String id) {
-        redisCache.deleteChannelFromCacheList(CACHE_LIST, id);
+        try {
+            redisCache.deleteChannelFromCacheList(CACHE_LIST, id);
+        } catch(Exception e){
+            System.out.println("On ChannelService delChannelById: " + e.getMessage());
+        }
         Query query = new Query();
         query.addCriteria(Criteria.where("channelID").is(id));
         DeleteResult res = mongoTemplate.remove(query, Channel.class);
@@ -77,29 +84,23 @@ public class ChannelService {
         }
     }
 
-    public boolean addUser(String channelId, String user, boolean isSubscribe) {
+    public boolean addUser(String channelId, String userID, boolean isSubscribe) {
         Channel ch = this.getChannelById(channelId);
         if (ch == null) return false;
         if (ch.isPriv() && isSubscribe) return false;
 
         List<String> members = ch.getMembers();
-        members.add(user);
-        ch.setMembers(members);
+        if(!members.contains(userID)){
+            members.add(userID);
+            ch.setMembers(members);
+        }
 
         this.updateChannel(ch);
-
-        redisCache.deleteUserFromCacheList(CACHE_LIST, user);
-        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(ch), 20);
-
-
         return true;
     }
 
     public void updateChannel(Channel ch){
         this.delChannelById(ch.getChannelID());
         this.createChannel(ch);
-
-        redisCache.deleteUserFromCacheList(CACHE_LIST, ch.getChannelID());
-        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(ch), 20);
     }
 }

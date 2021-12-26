@@ -62,14 +62,21 @@ public class UserService {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("userID").is(id));
-            return mongoTemplate.find(query, User.class).get(0);
+            User user = mongoTemplate.find(query, User.class).get(0);;
+            if(user != null)
+                redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
+            return user;
         }catch (IndexOutOfBoundsException e){
             return null;
         }
     }
 
     public void delUserById(String id) {
-        redisCache.deleteUserFromCacheList(CACHE_LIST, id);
+        try {
+            redisCache.deleteUserFromCacheList(CACHE_LIST, id);
+        } catch(Exception e){
+            System.out.println("On Userservice delUserById: " + e.getMessage());
+        }
         Query query = new Query();
         query.addCriteria(Criteria.where("userID").is(id));
         DeleteResult res = mongoTemplate.remove(query, User.class);
@@ -90,18 +97,11 @@ public class UserService {
         u.setChannelIds(channelIds);
 
         this.updateUser(u);
-
-        redisCache.deleteChannelFromCacheList(CACHE_LIST,channelId);
-        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(u), 20);
-
     }
 
     public void updateUser(User user){
         this.delUserById(user.getUserID());
         this.createUser(user);
-
-        redisCache.deleteUserFromCacheList(CACHE_LIST, user.getUserID());
-        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
     }
 
 }

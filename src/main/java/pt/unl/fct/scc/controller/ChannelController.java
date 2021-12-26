@@ -37,7 +37,7 @@ public class ChannelController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(channel, HttpStatus.CREATED);
+        return new ResponseEntity<>(String.format("Your channel was created successfully with ID: %s.", channel.getChannelID()), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -47,17 +47,26 @@ public class ChannelController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>( HttpStatus.OK);
+        return new ResponseEntity<>(String.format("The channel with ID: %s was deleted successfully.", id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateChannel(@PathVariable String id, @RequestBody Channel channel) {
+        Channel check;
+        try {
+            check = channelService.getChannelById(id);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (check == null) {
+            return new ResponseEntity<>(String.format("The channel with ID: %s was not found.", channel.getChannelID()), HttpStatus.NOT_FOUND);
+        }
         try {
             channelService.updateChannel(channel);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(channel, HttpStatus.OK);
+        return new ResponseEntity<>(String.format("The channel with ID: %s was updated successfully.", channel.getChannelID()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -69,18 +78,20 @@ public class ChannelController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (res == null) {
-            return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(String.format("The channel with ID: %s was not found.", id), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @PostMapping("/{channelId}/add/{userId}")
     public ResponseEntity<?> addUserToChannel(@PathVariable String channelId, @PathVariable String userId){
-        if (userService.getUserById(userId) == null || !channelService.addUser(channelId, userId, false)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (userService.getUserById(userId) == null) {
+            return new ResponseEntity<>(String.format("The user with ID: %s was not found.", userId), HttpStatus.NOT_FOUND);
+        } else if (!channelService.addUser(channelId, userId, false)) {
+            return new ResponseEntity<>("Channel not found or is private", HttpStatus.FORBIDDEN);
         }
         userService.subscibeToChannel(userId, channelId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(String.format("The user %s has subscribed to %s", userId, channelId),HttpStatus.OK);
     }
 }

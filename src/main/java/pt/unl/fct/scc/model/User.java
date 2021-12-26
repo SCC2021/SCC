@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String userID;
     private String name;
     private String pwd;
