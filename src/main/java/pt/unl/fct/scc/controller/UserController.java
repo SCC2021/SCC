@@ -6,13 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.scc.model.User;
-import pt.unl.fct.scc.model.UserDAO;
 import pt.unl.fct.scc.service.ChannelService;
 import pt.unl.fct.scc.service.UserService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -33,7 +31,7 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<?> getUsers() {
-        List<UserDAO> res = userService.getUsers();
+        List<User> res = userService.getUsers();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -45,9 +43,8 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        CosmosItemResponse res;
         try {
-            res = userService.createUser(new UserDAO(user));
+            userService.createUser(user);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -62,16 +59,15 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id, HttpServletRequest request) {
-        CosmosItemResponse res;
         if (!this.CheckUser(request, id)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         try {
-            res = userService.delUserById(id);
+            userService.delUserById(id);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     /**
@@ -103,7 +99,7 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserByID(@PathVariable String id) {
-        UserDAO res;
+        User res;
         try {
             res = userService.getUserById(id);
         } catch (Exception e) {
@@ -124,7 +120,7 @@ public class UserController {
      */
     @GetMapping("/{id}/channels")
     public ResponseEntity<?> getUserChannelsByID(@PathVariable String id) {
-        UserDAO res;
+        User res;
         try {
             res = userService.getUserById(id);
         } catch (Exception e) {

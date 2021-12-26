@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Channel {
-    private String id;
+    private String channelID;
     private String name;
     private boolean priv;
     private String owner;

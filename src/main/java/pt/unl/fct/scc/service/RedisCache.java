@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.scc.model.ChannelDAO;
-import pt.unl.fct.scc.model.MessageDAO;
-import pt.unl.fct.scc.model.UserDAO;
+import pt.unl.fct.scc.model.*;
 import pt.unl.fct.scc.util.GsonMapper;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -44,8 +42,8 @@ public class RedisCache {
     public void init() {
         this.gson = gsonMapper.getGson();
         // Connect to the Azure Cache for Redis over the TLS/SSL port using the key.
-        JedisShardInfo shardInfo = new JedisShardInfo(redisHostName, 6380, true);
-        shardInfo.setPassword(redisKey); /* Use your access key. */
+        JedisShardInfo shardInfo = new JedisShardInfo(redisHostName, 6379, false);
+        //shardInfo.setPassword(redisKey); /* Use your access key. */
         this.jedis = new Jedis(shardInfo);
     }
 
@@ -81,13 +79,13 @@ public class RedisCache {
         return null;
     }
 
-    public MessageDAO getMessageFromCacheList(String list_key, String id) {
+    public Message getMessageFromCacheList(String list_key, String id) {
         logger.info("Getting from Cache List");
         List<String> messages = jedis.lrange(list_key, 0, -1);
         if (messages.size() > 0) {
             for (String s : messages) {
-                MessageDAO msg = gson.fromJson(s, MessageDAO.class);
-                if (msg.getId().equals(id)) {
+                Message msg = gson.fromJson(s, Message.class);
+                if (msg.getMessageID().equals(id)) {
                     return msg;
                 }
             }
@@ -96,13 +94,13 @@ public class RedisCache {
         return null;
     }
 
-    public ChannelDAO getChannelFromCacheList(String list_key, String id) {
+    public Channel getChannelFromCacheList(String list_key, String id) {
         logger.info("Getting from Cache List");
         List<String> messages = jedis.lrange(list_key, 0, -1);
         if (messages.size() > 0) {
             for (String s : messages) {
-                ChannelDAO msg = gson.fromJson(s, ChannelDAO.class);
-                if (msg.getId().equals(id)) {
+                Channel msg = gson.fromJson(s, Channel.class);
+                if (msg.getChannelID().equals(id)) {
                     return msg;
                 }
             }
@@ -111,13 +109,13 @@ public class RedisCache {
         return null;
     }
 
-    public UserDAO getUserFromCacheList(String list_key, String id) {
+    public User getUserFromCacheList(String list_key, String id) {
         logger.info("Getting from Cache List");
         List<String> messages = jedis.lrange(list_key, 0, -1);
         if (messages.size() > 0) {
             for (String s : messages) {
-                UserDAO msg = gson.fromJson(s, UserDAO.class);
-                if (msg.getId().equals(id)) {
+                User msg = gson.fromJson(s, User.class);
+                if (msg.getUserID().equals(id)) {
                     return msg;
                 }
             }
@@ -129,12 +127,12 @@ public class RedisCache {
     public void deleteMessageFromCacheList(String list_key, String id) {
         logger.info("Deleting in Cache");
         List<String> messages = jedis.lrange(list_key, 0, -1);
-        List<MessageDAO> list = new LinkedList<>();
+        List<Message> list = new LinkedList<>();
 
         if (messages.size() > 0) {
             for (String s : messages) {
-                MessageDAO msg = gson.fromJson(s, MessageDAO.class);
-                if (!msg.getId().equals(id)) {
+                Message msg = gson.fromJson(s, Message.class);
+                if (!msg.getMessageID().equals(id)) {
                     list.add(msg);
                 }
             }
@@ -142,7 +140,7 @@ public class RedisCache {
 
         jedis.del(list_key);
 
-        for (MessageDAO m : list) {
+        for (Message m : list) {
             Long cnt = jedis.lpush(list_key, gson.toJson(m));
         }
     }
@@ -150,12 +148,12 @@ public class RedisCache {
     public void deleteChannelFromCacheList(String list_key, String id) {
         logger.info("Deleting in Cache");
         List<String> messages = jedis.lrange(list_key, 0, -1);
-        List<ChannelDAO> list = new LinkedList<>();
+        List<Channel> list = new LinkedList<>();
 
         if (messages.size() > 0) {
             for (String s : messages) {
-                ChannelDAO msg = gson.fromJson(s, ChannelDAO.class);
-                if (!msg.getId().equals(id)) {
+                Channel msg = gson.fromJson(s, Channel.class);
+                if (!msg.getChannelID().equals(id)) {
                     list.add(msg);
                 }
             }
@@ -163,7 +161,7 @@ public class RedisCache {
 
         jedis.del(list_key);
 
-        for (ChannelDAO m : list) {
+        for (Channel m : list) {
             Long cnt = jedis.lpush(list_key, gson.toJson(m));
         }
     }
@@ -171,12 +169,12 @@ public class RedisCache {
     public void deleteUserFromCacheList(String list_key, String id) {
         logger.info("Deleting in Cache");
         List<String> messages = jedis.lrange(list_key, 0, -1);
-        List<UserDAO> list = new LinkedList<>();
+        List<User> list = new LinkedList<>();
 
         if (messages.size() > 0) {
             for (String s : messages) {
-                UserDAO msg = gson.fromJson(s, UserDAO.class);
-                if (!msg.getId().equals(id)) {
+                User msg = gson.fromJson(s, User.class);
+                if (!msg.getUserID().equals(id)) {
                     list.add(msg);
                 }
             }
@@ -184,7 +182,7 @@ public class RedisCache {
 
         jedis.del(list_key);
 
-        for (UserDAO m : list) {
+        for (User m : list) {
             Long cnt = jedis.lpush(list_key, gson.toJson(m));
         }
     }

@@ -1,12 +1,10 @@
 package pt.unl.fct.scc.controller;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.scc.model.Channel;
-import pt.unl.fct.scc.model.ChannelDAO;
 import pt.unl.fct.scc.service.ChannelService;
 import pt.unl.fct.scc.service.UserService;
 
@@ -23,20 +21,19 @@ public class ChannelController {
 
     @GetMapping
     public ResponseEntity<?> getChannels() {
-        List<ChannelDAO> res = channelService.getChannels();
+        List<Channel> res = channelService.getChannels();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<?> createChannel(@RequestBody Channel channel) {
-        CosmosItemResponse res;
-        channel.setId(UUID.randomUUID().toString());
+        channel.setChannelID(UUID.randomUUID().toString());
         String owner = channel.getOwner();
         if (channel.getMembers() == null) channel.setMembers(new LinkedList<String>());
         channel.getMembers().add(owner == null ? "":owner);
 
         try {
-            res = channelService.createChannel(new ChannelDAO(channel));
+           channelService.createChannel(channel);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -45,18 +42,16 @@ public class ChannelController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteChannel(@PathVariable String id) {
-        CosmosItemResponse res;
         try {
-            res = channelService.delChannelById(id);
+            channelService.delChannelById(id);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>( HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateChannel(@PathVariable String id, @RequestBody Channel channel) {
-        CosmosItemResponse res;
         try {
             channelService.updateChannel(channel);
         } catch (Exception e) {
@@ -67,7 +62,7 @@ public class ChannelController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getChannelByID(@PathVariable String id) {
-        ChannelDAO res;
+        Channel res;
         try {
             res = channelService.getChannelById(id);
         } catch (Exception e) {

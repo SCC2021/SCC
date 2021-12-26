@@ -1,54 +1,56 @@
 package pt.unl.fct.scc.service;
 
-import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
+import com.mongodb.client.result.DeleteResult;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.scc.model.ChannelDAO;
-import pt.unl.fct.scc.model.MessageDAO;
-import pt.unl.fct.scc.model.TrendingDAO;
+import pt.unl.fct.scc.model.*;
+import pt.unl.fct.scc.repository.MessageRepo;
 import pt.unl.fct.scc.util.GsonMapper;
 
 import java.util.*;
 
 @Service
 public class MessageService {
-    private final CosmosContainer cosmosContainer;
     private final Gson gson;
     private final RedisCache redisCache;
+    private final MongoTemplate mongoTemplate;
+    private final MessageRepo messageRepo;
 
-    public MessageService(CosmosDBService cosmosDBService, RedisCache redisCache, GsonMapper gsonMapper) {
-        this.cosmosContainer = cosmosDBService.getContainer("Messages");
+
+    public MessageService(RedisCache redisCache, GsonMapper gsonMapper, MongoTemplate mongoTemplate, MessageRepo messageRepo) {
+        this.mongoTemplate = mongoTemplate;
+        this.messageRepo = messageRepo;
         this.gson = gsonMapper.getGson();
         this.redisCache = redisCache;
     }
 
-    public CosmosItemResponse<MessageDAO> createMessage(MessageDAO message) {
+    public void createMessage(Message message) {
         System.out.println(message);
         redisCache.storeInCacheListLimited("recentMessages", gson.toJson(message), 20);
-        return cosmosContainer.createItem(message);
+        messageRepo.save(message);
     }
 
-    public List<MessageDAO> getMessages() {
-        List<MessageDAO> list = redisCache.getListFromCache("recentMessages", MessageDAO.class);
+    public List<Message> getMessages() {
+        List<Message> list = redisCache.getListFromCache("recentMessages", Message.class);
         if (list != null) {
             return list;
         }
 
-        CosmosPagedIterable<MessageDAO> res = cosmosContainer.queryItems("SELECT * FROM Messages ", new CosmosQueryRequestOptions(), MessageDAO.class);
-        List<MessageDAO> ret = new LinkedList<>();
-        for (MessageDAO m : res) {
-            ret.add(m);
-        }
-        return ret;
+        list = messageRepo.findAll();
+
+        return list;
     }
 
-    public List<ChannelDAO> getTrendingChannels() {
-        String last_15_minutes = String.valueOf(System.currentTimeMillis() - 15*60*1000);
+    public List<Channel> getTrendingChannels() {
+        /*String last_15_minutes = String.valueOf(System.currentTimeMillis() - 15*60*1000);
         CosmosPagedIterable<TrendingDAO> res = cosmosContainer.queryItems(String.format("SELECT c.channelDest , count(c.channelDest) as messageCount FROM c WHERE c.sentAt > %s  GROUP BY c.channelDest", last_15_minutes), new CosmosQueryRequestOptions(), TrendingDAO.class);
         List<TrendingDAO> ret = new ArrayList<>();
         for (TrendingDAO t : res) {
@@ -63,28 +65,35 @@ public class MessageService {
             if (cache != null && !cache.isPriv()) {
                 trending.add(cache);
             }
-        }
-        return trending;
+        }*/
+
+        return null;
     }
 
-    public MessageDAO getMessageById(String id) {
-        MessageDAO cache = redisCache.getMessageFromCacheList("recentMessages", id);
+    public Message getMessageById(String id) {
+        Message cache = redisCache.getMessageFromCacheList("recentMessages", id);
         if (cache != null) {
             return cache;
         }
 
-        CosmosPagedIterable<MessageDAO> res = cosmosContainer.queryItems("SELECT * FROM Messages WHERE Messages.id=\"" + id + "\"", new CosmosQueryRequestOptions(), MessageDAO.class);
-        for (MessageDAO m : res) {
-            return m; // There should only be one message with the ID
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("messageID").is(id));
+            return mongoTemplate.find(query, Message.class).get(0);
+        }catch (IndexOutOfBoundsException e){
+            return null;
         }
-        return null;
 
     }
 
-    public CosmosItemResponse<Object> delMessageById(String id) {
+    public void delMessageById(String id) {
         redisCache.deleteMessageFromCacheList("recentMessages", id);
 
-        PartitionKey key = new PartitionKey(id);
-        return cosmosContainer.deleteItem(id, key, new CosmosItemRequestOptions());
+        Query query = new Query();
+        query.addCriteria(Criteria.where("messageID").is(id));
+        DeleteResult res = mongoTemplate.remove(query, Message.class);
+        if (res.getDeletedCount() == 0){
+            return;
+        }
     }
 }

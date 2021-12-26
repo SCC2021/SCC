@@ -1,96 +1,95 @@
 package pt.unl.fct.scc.service;
 
-import com.azure.cosmos.CosmosContainer;
-import com.azure.cosmos.models.*;
-import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
+import com.mongodb.client.result.DeleteResult;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.scc.model.Channel;
-import pt.unl.fct.scc.model.DeletedDAO;
 import pt.unl.fct.scc.model.User;
-import pt.unl.fct.scc.model.UserDAO;
+import pt.unl.fct.scc.repository.UserRepo;
 import pt.unl.fct.scc.util.GsonMapper;
 import pt.unl.fct.scc.util.Hash;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
 public class UserService {
 
-    CosmosContainer usersCosmosContainer;
-    CosmosContainer deletedUsersCosmosContainer;
     private final Gson gson;
     private final RedisCache redisCache;
     private final String CACHE_LIST = "recentUsers";
     private final Hash hash;
+    private final MongoTemplate mongoTemplate;
+    private final UserRepo userRepo;
 
 
-    public UserService(CosmosDBService cosmosDBService, RedisCache redisCache, GsonMapper gsonMapper, Hash hash) {
-        this.usersCosmosContainer = cosmosDBService.getContainer("Users");
-        this.deletedUsersCosmosContainer = cosmosDBService.getContainer("DeletedUsers");
+    public UserService(RedisCache redisCache, GsonMapper gsonMapper, Hash hash, MongoTemplate mongoTemplate, UserRepo userRepo) {
         this.gson = gsonMapper.getGson();
         this.redisCache = redisCache;
         this.hash = hash;
+        this.mongoTemplate = mongoTemplate;
+        this.userRepo = userRepo;
     }
 
-    public CosmosItemResponse<UserDAO> createUser(UserDAO user) {
+    public void createUser(User user) {
         user.setPwd(hash.of(user.getPwd()));
         if (user.getChannelIds() == null){
             user.setChannelIds(new ArrayList<>());
         }
         redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
-        return usersCosmosContainer.createItem(user);
+        userRepo.save(user);
     }
 
-    public List<UserDAO> getUsers() {
-        List<UserDAO> list = redisCache.getListFromCache(CACHE_LIST, UserDAO.class);
+    public List<User> getUsers() {
+        List<User> list = redisCache.getListFromCache(CACHE_LIST, User.class);
         if (list != null) {
             return list;
         }
 
-        CosmosPagedIterable<UserDAO> res = usersCosmosContainer.queryItems("SELECT * FROM Users ", new CosmosQueryRequestOptions(), UserDAO.class);
+        list = userRepo.findAll();
 
-        List<UserDAO> ret = new LinkedList<>();
-        for (UserDAO m : res) {
-            ret.add(m);
-        }
-        return ret;
+        return list;
     }
 
-    public UserDAO getUserById(String id) {
-        UserDAO cache = redisCache.getUserFromCacheList(CACHE_LIST, id);
+    public User getUserById(String id) {
+        User cache = redisCache.getUserFromCacheList(CACHE_LIST, id);
         if (cache != null) {
             return cache;
         }
 
-        CosmosPagedIterable<UserDAO> res = usersCosmosContainer.queryItems("SELECT * FROM Users WHERE Users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);
-        for (UserDAO m : res) {
-            return m; // There should only be one message with the ID
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("userID").is(id));
+            return mongoTemplate.find(query, User.class).get(0);
+        }catch (IndexOutOfBoundsException e){
+            return null;
         }
-        return null;
     }
 
-    public CosmosItemResponse<Object> delUserById(String id) {
+    public void delUserById(String id) {
         redisCache.deleteUserFromCacheList(CACHE_LIST, id);
-        DeletedDAO deleted = new DeletedDAO();
-        deleted.setId(id);
-        deletedUsersCosmosContainer.createItem(deleted);
-        System.out.println("Added to deleted DB");
-        return usersCosmosContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userID").is(id));
+        DeleteResult res = mongoTemplate.remove(query, User.class);
+        if (res.getDeletedCount() == 0){
+            return;
+        }
+
     }
 
     public void subscibeToChannel(String user, String channelId) {
-        UserDAO u = this.getUserById(user);
+        User u = this.getUserById(user);
+
+        if (u == null) return;
 
         List<String> channelIds = u.getChannelIds();
         if (channelIds == null) channelIds = (new ArrayList<>());
         channelIds.add(channelId);
         u.setChannelIds(channelIds);
 
-        CosmosPatchOperations op = CosmosPatchOperations.create().replace("/channelIds",channelIds);
-        usersCosmosContainer.patchItem(user,new PartitionKey(user),op,UserDAO.class);
+        this.updateUser(u);
 
         redisCache.deleteChannelFromCacheList(CACHE_LIST,channelId);
         redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(u), 20);
@@ -98,9 +97,10 @@ public class UserService {
     }
 
     public void updateUser(User user){
-        usersCosmosContainer.replaceItem(user, user.getId(), new PartitionKey(user.getId()), new CosmosItemRequestOptions());
+        this.delUserById(user.getUserID());
+        this.createUser(user);
 
-        redisCache.deleteUserFromCacheList(CACHE_LIST, user.getId());
+        redisCache.deleteUserFromCacheList(CACHE_LIST, user.getUserID());
         redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
     }
 

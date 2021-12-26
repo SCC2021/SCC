@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {
-    private String id;
+    private String messageID;
     private String responseTo;
     private String channelDest;
     private String user;
@@ -22,7 +22,7 @@ public class Message {
 
     public void setId() {
         UUID uid = UUID.randomUUID();
-        this.id = uid.toString();
+        this.messageID = uid.toString();
     }
 
     public void setSent(){
