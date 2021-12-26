@@ -1,0 +1,45 @@
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: scc-app-svc
+spec:
+  selector:
+    app: scc-app
+  ports:
+    - protocol: TCP
+      port: 8081 # The port that the service is running on in the cluster
+      nodePort: 30082
+      targetPort: 8081
+  type: LoadBalancer # type of the service. LoadBalancer indicates that our service will be external.
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment # Kubernetes resource kind we are creating
+metadata:
+  name: scc-app
+spec:
+  selector:
+    matchLabels:
+      app: scc-app
+  replicas: 1 # Number of replicas that will be created for this deployment
+  template:
+    metadata:
+      labels:
+        app: scc-app
+    spec:
+      containers:
+        - name: scc-app
+          image: pdimas12/scc-app # Image that will be used to containers in the cluster
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081 # The port that the container is running on in the cluster
+          env:
+            - name: REDIS_HOST
+              value: 10.104.173.148
+            - name: REDIS_PASSWORD
+              value: 1e1FBJZPgd
+            - name: MONGODB_ROOT_PASSWORD
+              value: NPYtrjZv0Z
+            - name: MONGODB_HOST
+              value: my-release-mongodb.default.svc.cluster.local
