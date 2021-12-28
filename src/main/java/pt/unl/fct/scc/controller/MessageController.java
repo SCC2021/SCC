@@ -32,14 +32,14 @@ public class MessageController {
         try {
             message.setId();
             message.setSent();
-            if (!this.CheckUser(request,message.getUser())){
+            if (!this.CheckUser(request, message.getUser())) {
                 return new ResponseEntity<>("Invalid session, login first", HttpStatus.FORBIDDEN);
             }
             messageService.createMessage(message);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(String.format("Message created with ID: %s", message.getMessageID()), HttpStatus.CREATED);
+        return new ResponseEntity<>(String.format("Message created with ID: %s saying %s", message.getMessageID(), message.getBody()), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -49,18 +49,28 @@ public class MessageController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(String.format("Message with ID: %s deleted successfully.", id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateMessage(@PathVariable String id, @RequestBody Message message) {
+        Message res;
         try {
+            res = messageService.getMessageById(id);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (res == null)
+            return new ResponseEntity<>(String.format("The message with ID: %s was not found.", id), HttpStatus.NOT_FOUND);
+
+        try {
+            message.setMessageID(id);
             messageService.delMessageById(id);
             messageService.createMessage(message);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        return new ResponseEntity<>(String.format("The message with ID: %s was successfully edited.", id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -71,9 +81,9 @@ public class MessageController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (res == null) {
-            return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
-        }
+        if (res == null)
+            return new ResponseEntity<>(String.format("The message with ID: %s was not found.", id), HttpStatus.NOT_FOUND);
+
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -90,6 +100,7 @@ public class MessageController {
     @GetMapping("/trending")
     public ResponseEntity<?> getTrendingChannels() {
         List<Channel> res = messageService.getTrendingChannels();
-        return new ResponseEntity<>( HttpStatus.NOT_IMPLEMENTED);
+        // String.format("SELECT c.channelDest , count(c.channelDest) as messageCount FROM c WHERE c.sentAt > %s  GROUP BY c.channelDest", last_15_minutes
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

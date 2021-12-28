@@ -72,9 +72,8 @@ public class MessageService {
 
     public Message getMessageById(String id) {
         Message cache = redisCache.getMessageFromCacheList("recentMessages", id);
-        if (cache != null) {
+        if (cache != null)
             return cache;
-        }
 
         try {
             Query query = new Query();
@@ -87,7 +86,12 @@ public class MessageService {
     }
 
     public void delMessageById(String id) {
-        redisCache.deleteMessageFromCacheList("recentMessages", id);
+
+        try {
+            redisCache.deleteMessageFromCacheList("recentMessages", id);
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
 
         Query query = new Query();
         query.addCriteria(Criteria.where("messageID").is(id));
