@@ -33,13 +33,13 @@ public class MessageController {
             message.setId();
             message.setSent();
             if (!this.CheckUser(request,message.getUser())){
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>("Invalid session, login first", HttpStatus.FORBIDDEN);
             }
             messageService.createMessage(message);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        return new ResponseEntity<>(String.format("Message created with ID: %s", message.getMessageID()), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
