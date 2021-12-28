@@ -40,10 +40,11 @@ public class RedisCache {
 
     @PostConstruct
     public void init() {
+        System.out.println("STARING REDIS " + redisHostName + " " + redisKey);
         this.gson = gsonMapper.getGson();
         // Connect to the Azure Cache for Redis over the TLS/SSL port using the key.
         JedisShardInfo shardInfo = new JedisShardInfo(redisHostName, 6379, false);
-        //shardInfo.setPassword(redisKey); /* Use your access key. */
+        shardInfo.setPassword(redisKey); /* Use your access key. */
         this.jedis = new Jedis(shardInfo);
     }
 

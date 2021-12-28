@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.exceptions.BlobNotFoundException;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
 @Service
@@ -29,9 +30,7 @@ public class FileService {
         File f = new File("images/"+key);
         if (!f.exists()) throw new BlobNotFoundException();
         try {
-            FileInputStream fis = new FileInputStream(f);
-            BufferedInputStream reader = new BufferedInputStream(fis);
-            return reader.readAllBytes();
+            return Files.readAllBytes(f.toPath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
