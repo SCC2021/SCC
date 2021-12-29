@@ -21,7 +21,7 @@ public class AuthService {
     public boolean checkAccess(AuthModel authModel) {
         User user = userService.getUserById(authModel.getId());
         if (user == null) return false;
-        return (user.getPwd().equals(hash.of(authModel.getPassword())));
+        return (user.getPwd().equals(authModel.getPassword()));
     }
 
 

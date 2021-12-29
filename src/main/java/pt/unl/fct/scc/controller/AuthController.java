@@ -1,10 +1,9 @@
 package pt.unl.fct.scc.controller;
 
 import com.google.gson.Gson;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.scc.model.AuthModel;
 import pt.unl.fct.scc.service.AuthService;
 import pt.unl.fct.scc.service.RedisCache;
@@ -29,9 +28,17 @@ public class AuthController {
         this.redisCache = redisCache;
     }
 
+    @GetMapping()
+    public ResponseEntity<?> deleteCache() {
+        redisCache.deleteAll();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping
     public void login(@RequestBody AuthModel authModel, HttpServletResponse response) {
         logger.info("Login");
+        System.out.println(authModel.getId());
+        System.out.println(authModel.getPassword());
         if (!authService.checkAccess(authModel)) {
             response.setStatus(401);
             return;

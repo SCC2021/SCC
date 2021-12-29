@@ -8,7 +8,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8081 # The port that the service is running on in the cluster
-      nodePort: 30083
+      nodePort: 30097
       targetPort: 8081
   type: LoadBalancer # type of the service. LoadBalancer indicates that our service will be external.
 status:
@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: scc-app
-          image: pdimas12/scc-app:prd # Image that will be used to containers in the cluster
+          image: pdimas12/scc-app:prd20 # Image that will be used to containers in the cluster
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081 # The port that the container is running on in the cluster

@@ -1,8 +1,5 @@
 package pt.unl.fct.scc.service;
 
-import com.azure.cosmos.CosmosContainer;
-import com.azure.cosmos.models.*;
-import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,13 +7,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.Channel;
-import pt.unl.fct.scc.model.Channel;
-import pt.unl.fct.scc.model.DeletedDAO;
-import pt.unl.fct.scc.model.User;
+import pt.unl.fct.scc.model.Message;
 import pt.unl.fct.scc.repository.ChannelRepo;
 import pt.unl.fct.scc.util.GsonMapper;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -37,8 +31,8 @@ public class ChannelService {
     }
 
     public void createChannel(Channel channel) {
-        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(channel), 20);
         channelRepo.save(channel);
+        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(channel), 20);
     }
 
     public List<Channel> getChannels() {
@@ -47,9 +41,9 @@ public class ChannelService {
             return list;
         }
 
-        list = channelRepo.findAll();
-
-        return list;
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(false));
+        return mongoTemplate.find(query, Channel.class);
     }
 
     public Channel getChannelById(String id) {
@@ -60,28 +54,37 @@ public class ChannelService {
 
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("channelID").is(id));
+            query.addCriteria(Criteria.where("channelID").is(id).and("deleted").is(false));
             Channel channel = mongoTemplate.find(query, Channel.class).get(0);
-            if(channel != null)
+            if (channel != null)
                 redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(channel), 20);
             return channel;
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return null;
         }
     }
 
     public void delChannelById(String id) {
+        Channel channel = this.getChannelById(id);
+        if (channel != null){
+            channel.setDeleted(true);
+            this.updateChannel(channel);
+        }
+
         try {
             redisCache.deleteChannelFromCacheList(CACHE_LIST, id);
-        } catch(Exception e){
+        } catch (Exception e) {
             System.out.println("On ChannelService delChannelById: " + e.getMessage());
         }
+        /*
         Query query = new Query();
         query.addCriteria(Criteria.where("channelID").is(id));
         DeleteResult res = mongoTemplate.remove(query, Channel.class);
-        if (res.getDeletedCount() == 0){
+        if (res.getDeletedCount() == 0) {
             return;
         }
+
+         */
     }
 
     public boolean addUser(String channelId, String userID, boolean isSubscribe) {
@@ -90,7 +93,7 @@ public class ChannelService {
         if (ch.isPriv() && isSubscribe) return false;
 
         List<String> members = ch.getMembers();
-        if(!members.contains(userID)){
+        if (!members.contains(userID)) {
             members.add(userID);
             ch.setMembers(members);
         }
@@ -99,8 +102,40 @@ public class ChannelService {
         return true;
     }
 
-    public void updateChannel(Channel ch){
-        this.delChannelById(ch.getChannelID());
+    public void updateChannel(Channel ch) {
+        this.purgeChannelById(ch.getChannelID());
         this.createChannel(ch);
+    }
+
+    private void purgeChannelById(String channelID) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("channelID").is(channelID));
+        DeleteResult res = mongoTemplate.remove(query, Channel.class);
+        if (res.getDeletedCount() == 0) {
+            return;
+        }
+    }
+
+    public void insertMessage(Message message) {
+        Channel ch = this.getChannelById(message.getChannelDest());
+        List<Message> messageList = ch.getMessageList();
+        messageList.add(message);
+        ch.setMessageList(messageList);
+        this.updateChannel(ch);
+    }
+
+    public List<Channel> getDeleted() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(true));
+        return mongoTemplate.find(query, Channel.class);
+    }
+
+    public void purgeChannels() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(true));
+        DeleteResult res = mongoTemplate.remove(query, Channel.class);
+        if (res.getDeletedCount() == 0) {
+            return;
+        }
     }
 }

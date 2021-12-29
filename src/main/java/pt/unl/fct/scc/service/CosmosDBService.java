@@ -2,7 +2,6 @@ package pt.unl.fct.scc.service;
 
 import com.azure.cosmos.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 

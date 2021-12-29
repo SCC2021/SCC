@@ -1,21 +1,17 @@
 package pt.unl.fct.scc.service;
 
-import com.azure.cosmos.models.CosmosItemRequestOptions;
-import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.PartitionKey;
-import com.azure.cosmos.util.CosmosPagedIterable;
 import com.google.gson.Gson;
 import com.mongodb.client.result.DeleteResult;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.scc.model.*;
+import pt.unl.fct.scc.model.Channel;
+import pt.unl.fct.scc.model.Message;
 import pt.unl.fct.scc.repository.MessageRepo;
 import pt.unl.fct.scc.util.GsonMapper;
 
-import java.util.*;
+import java.util.List;
 
 @Service
 public class MessageService {
@@ -33,9 +29,8 @@ public class MessageService {
     }
 
     public void createMessage(Message message) {
-        System.out.println(message);
-        redisCache.storeInCacheListLimited("recentMessages", gson.toJson(message), 20);
         messageRepo.save(message);
+        redisCache.storeInCacheListLimited("recentMessages", gson.toJson(message), 20);
     }
 
     public List<Message> getMessages() {
@@ -44,9 +39,9 @@ public class MessageService {
             return list;
         }
 
-        list = messageRepo.findAll();
-
-        return list;
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(false));
+        return mongoTemplate.find(query, Message.class);
     }
 
     public List<Channel> getTrendingChannels() {
@@ -77,26 +72,62 @@ public class MessageService {
 
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("messageID").is(id));
+            query.addCriteria(Criteria.where("messageID").is(id).and("deleted").is(false));
             return mongoTemplate.find(query, Message.class).get(0);
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return null;
         }
 
     }
 
     public void delMessageById(String id) {
+        Message m = this.getMessageById(id);
+        if (m != null){
+            m.setDeleted(true);
+            this.updateMessage(m);
+        }
 
         try {
             redisCache.deleteMessageFromCacheList("recentMessages", id);
-        } catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
+        /*
         Query query = new Query();
         query.addCriteria(Criteria.where("messageID").is(id));
         DeleteResult res = mongoTemplate.remove(query, Message.class);
-        if (res.getDeletedCount() == 0){
+        if (res.getDeletedCount() == 0) {
+            return;
+        }
+         */
+    }
+
+    public void updateMessage(Message message){
+        this.purgeMessageById(message.getMessageID());
+        this.createMessage(message);
+    }
+
+    public List<Message> getDeleted() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(true));
+        return mongoTemplate.find(query, Message.class);
+    }
+
+    public void purgeMessages() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(true));
+        DeleteResult res = mongoTemplate.remove(query, Message.class);
+        if (res.getDeletedCount() == 0) {
+            return;
+        }
+    }
+
+    private void purgeMessageById(String messageID) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("channelID").is(messageID));
+        DeleteResult res = mongoTemplate.remove(query, Message.class);
+        if (res.getDeletedCount() == 0) {
             return;
         }
     }

@@ -34,12 +34,12 @@ public class UserService {
     }
 
     public void createUser(User user) {
-        user.setPwd(hash.of(user.getPwd()));
-        if (user.getChannelIds() == null){
+        //user.setPwd(hash.of(user.getPwd()));
+        if (user.getChannelIds() == null) {
             user.setChannelIds(new ArrayList<>());
         }
-        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
         userRepo.save(user);
+        redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
     }
 
     public List<User> getUsers() {
@@ -62,11 +62,12 @@ public class UserService {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("userID").is(id));
-            User user = mongoTemplate.find(query, User.class).get(0);;
-            if(user != null)
+            User user = mongoTemplate.find(query, User.class).get(0);
+            ;
+            if (user != null)
                 redisCache.storeInCacheListLimited(CACHE_LIST, gson.toJson(user), 20);
             return user;
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return null;
         }
     }
@@ -74,13 +75,13 @@ public class UserService {
     public void delUserById(String id) {
         try {
             redisCache.deleteUserFromCacheList(CACHE_LIST, id);
-        } catch(Exception e){
+        } catch (Exception e) {
             System.out.println("On Userservice delUserById: " + e.getMessage());
         }
         Query query = new Query();
         query.addCriteria(Criteria.where("userID").is(id));
         DeleteResult res = mongoTemplate.remove(query, User.class);
-        if (res.getDeletedCount() == 0){
+        if (res.getDeletedCount() == 0) {
             return;
         }
 
@@ -99,7 +100,7 @@ public class UserService {
         this.updateUser(u);
     }
 
-    public void updateUser(User user){
+    public void updateUser(User user) {
         this.delUserById(user.getUserID());
         this.createUser(user);
     }
