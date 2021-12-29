@@ -2,7 +2,7 @@ package pt.unl.fct.scc.service;
 
 import org.springframework.stereotype.Service;
 import pt.unl.fct.scc.model.AuthModel;
-import pt.unl.fct.scc.model.UserDAO;
+import pt.unl.fct.scc.model.User;
 import pt.unl.fct.scc.util.Hash;
 
 @Service
@@ -19,9 +19,9 @@ public class AuthService {
     }
 
     public boolean checkAccess(AuthModel authModel) {
-        UserDAO user = userService.getUserById(authModel.getId());
+        User user = userService.getUserById(authModel.getId());
         if (user == null) return false;
-        return (user.getPwd().equals(hash.of(authModel.getPassword())));
+        return (user.getPwd().equals(authModel.getPassword()));
     }
 
 
